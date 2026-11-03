@@ -76,6 +76,7 @@
     @keyframes identityPulse { 50% { transform: scale(1.25); } }
 
     .sound-toggle,
+    .music-toggle,
     .secret-star {
       position: fixed;
       z-index: 12;
@@ -91,11 +92,34 @@
       transition: 0.35s ease;
       opacity: 0.45;
     }
-    .sound-toggle {
+    .audio-controls {
+      position: fixed;
+      right: calc(16px + env(safe-area-inset-right, 0px));
+      bottom: calc(52px + env(safe-area-inset-bottom, 0px));
+      z-index: 12;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .audio-controls .sound-toggle,
+    .audio-controls .music-toggle {
+      position: static;
       right: calc(16px + env(safe-area-inset-right, 0px));
       bottom: calc(52px + env(safe-area-inset-bottom, 0px));
       font-family: Georgia, serif;
       font-size: 1rem;
+    }
+    .volume-slider {
+      width: 62px;
+      height: 2px;
+      accent-color: #b63a55;
+      opacity: .55;
+    }
+    .sound-toggle[aria-pressed="true"],
+    .music-toggle[aria-pressed="true"] {
+      opacity: .95;
+      color: #ff9eb6;
+      box-shadow: 0 0 20px rgba(255, 70, 115, 0.18);
     }
     .secret-star {
       left: calc(18px + env(safe-area-inset-left, 0px));
@@ -186,6 +210,27 @@
     @keyframes burst {
       0% { transform: translate(0, 0) scale(0.4) rotate(0deg); opacity: 1; }
       100% { transform: translate(var(--burst-x), var(--burst-y)) scale(1) rotate(var(--burst-r)); opacity: 0; }
+    }
+    .burst-heart {
+      position: absolute;
+      color: #ff6f92;
+      font-family: Georgia, serif;
+      font-size: clamp(12px, 3vw, 20px);
+      text-shadow: 0 0 12px rgba(255, 67, 111, 0.8);
+      animation: heartBurst 1.8s cubic-bezier(.18,.72,.32,1) forwards;
+    }
+    @keyframes heartBurst {
+      0% { transform: translate(0, 0) scale(.2); opacity: 1; }
+      100% { transform: translate(var(--burst-x), var(--burst-y)) scale(1.25); opacity: 0; }
+    }
+    .hidden-star {
+      opacity: .18 !important;
+      transform: scale(.78);
+    }
+    .hidden-star.found,
+    .secret-star.found {
+      opacity: .9 !important;
+      color: #a9ffc8;
     }
 
     .petals {

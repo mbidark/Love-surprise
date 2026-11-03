@@ -31,8 +31,13 @@
     <span>For Sinu</span>
     <strong>♡</strong>
   </div>
+  <div id="secret-stars" aria-label="Hidden stars"></div>
   <button id="secret-star" class="secret-star" aria-label="Open a hidden love note">✦</button>
-  <button id="sound-toggle" class="sound-toggle" aria-label="Toggle heartbeat sound" aria-pressed="false">♪</button>
+  <div class="audio-controls" aria-label="Sound controls">
+    <button id="sound-toggle" class="sound-toggle" aria-label="Toggle heartbeat sound" aria-pressed="false">♥</button>
+    <button id="music-toggle" class="music-toggle" aria-label="Toggle ambient music" aria-pressed="false">♫</button>
+    <input id="volume-slider" class="volume-slider" type="range" min="0" max="100" value="45" aria-label="Sound volume">
+  </div>
   <div id="secret-note" class="secret-note" aria-live="polite">You found one small piece of my heart.</div>
   <div id="rose-burst" class="rose-burst" aria-hidden="true"></div>
   <div id="hold-bloom" class="hold-bloom" aria-hidden="true"><span></span></div>
@@ -57,7 +62,7 @@
         <p>তোমার হাসিটুকুই আমার সবচেয়ে প্রিয় দৃশ্য, আর তোমার উপস্থিতিই আমার সবচেয়ে সুন্দর অনুভূতি।</p>
         <p>হাজারো ব্যস্ততার মাঝেও মনটা বারবার তোমার কাছেই ফিরে যায়।</p>
         <p>শুধু একটা কথাই বলতে চাই—</p>
-        <p class="final-line"><span>তুমি আছো বলেই আমার ছোট্ট পৃথিবীটা এত সুন্দর।</span></p>
+        <p class="final-line">তুমি আছো বলেই আমার ছোট্ট পৃথিবীটা এত সুন্দর।</p>
         <p class="love-signoff">With all my love,</p>
       </div>
       <div class="signature">

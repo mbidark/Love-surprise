@@ -87,6 +87,9 @@ import * as THREE from 'three';
     let hintDismissed = false;
     let audioContext = null;
     let soundEnabled = false;
+    let musicEnabled = false;
+    let masterVolume = 0.45;
+    let musicNodes = null;
     let longPressTimer = null;
     let lastHeartTapTime = 0;
     let singleTapTimer = null;
@@ -129,6 +132,27 @@ import * as THREE from 'three';
       secretNote.classList.add('visible');
       createRoseBurst();
       setTimeout(() => secretNote.classList.remove('visible'), 3600);
+    }
+
+    function createHeartBurst(originX = window.innerWidth / 2, originY = window.innerHeight / 2) {
+      roseBurst.replaceChildren();
+      const count = window.innerWidth < 600 ? 18 : 28;
+      for (let i = 0; i < count; i++) {
+        const heart = document.createElement('span');
+        heart.className = 'burst-heart';
+        heart.textContent = '♥';
+        heart.style.left = `${originX}px`;
+        heart.style.top = `${originY}px`;
+        const t = (i / count) * Math.PI * 2;
+        const heartX = 16 * Math.pow(Math.sin(t), 3);
+        const heartY = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+        const scale = 4 + Math.random() * 3;
+        heart.style.setProperty('--burst-x', `${heartX * scale}px`);
+        heart.style.setProperty('--burst-y', `${heartY * scale}px`);
+        heart.style.animationDelay = `${Math.random() * 0.18}s`;
+        roseBurst.appendChild(heart);
+      }
+      setTimeout(() => roseBurst.replaceChildren(), 2200);
     }
 
     function createPetals() {
@@ -654,8 +678,17 @@ import * as THREE from 'three';
        INTERACTION
     ============================================================ */
     function setupSurprises() {
+      const discoveredStars = new Set();
+      const starMessages = [
+        'A tiny secret: Sinu is my favorite constellation.',
+        'Somewhere between every breath and every dream, you are there.',
+        'The universe keeps this message safe: you are deeply loved.'
+      ];
       secretStar.addEventListener('click', () => {
-        showSecretMessage('A tiny secret: Sinu is my favorite constellation.');
+        discoveredStars.add(0);
+        secretStar.classList.add('found');
+        showSecretMessage(starMessages[0]);
+        checkAllStars();
       });
 
       soundToggle.addEventListener('click', async () => {
@@ -667,6 +700,95 @@ import * as THREE from 'three';
         soundToggle.setAttribute('aria-pressed', String(soundEnabled));
         if (soundEnabled) startHeartbeatSound();
       });
+
+      const musicToggle = document.getElementById('music-toggle');
+      musicToggle.addEventListener('click', async () => {
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') await audioContext.resume();
+        musicEnabled = !musicEnabled;
+        musicToggle.setAttribute('aria-pressed', String(musicEnabled));
+        if (musicEnabled) startAmbientMusic();
+        else stopAmbientMusic();
+      });
+
+      document.getElementById('volume-slider').addEventListener('input', (event) => {
+        masterVolume = Number(event.target.value) / 100;
+        if (musicNodes) {
+          musicNodes.gain.gain.setTargetAtTime(masterVolume * 0.055, audioContext.currentTime, 0.08);
+        }
+      });
+
+      const starsRoot = document.getElementById('secret-stars');
+      const mobile = window.innerWidth < 600;
+      const positions = mobile
+        ? [{x: 84, y: 24}, {x: 78, y: 68}]
+        : [{x: 18, y: 24}, {x: 82, y: 72}];
+      positions.forEach((position, index) => {
+        const star = document.createElement('button');
+        star.className = 'secret-star hidden-star';
+        star.textContent = '✦';
+        star.setAttribute('aria-label', 'Open a hidden love note');
+        star.style.left = `${position.x}%`;
+        star.style.top = `${position.y}%`;
+        star.style.setProperty('--star-x-offset', '-50%');
+        star.addEventListener('click', () => {
+          const id = index + 1;
+          if (discoveredStars.has(id)) return;
+          discoveredStars.add(id);
+          star.classList.add('found');
+          showSecretMessage(starMessages[id]);
+          checkAllStars();
+        });
+        starsRoot.appendChild(star);
+      });
+
+      function checkAllStars() {
+        if (discoveredStars.size === 3) {
+          showSecretMessage('Every star found. My whole universe is Sinu.');
+          createHeartBurst();
+          createRoseBurst();
+        }
+      }
+
+      const randomMessages = ['Still beating for you.', 'You are my favorite thought.', 'Come closer, my heart is waiting.', 'Sinu, my little universe.'];
+      setInterval(() => {
+        if (!letterVisible && introFinished && Math.random() > 0.68) {
+          showSecretMessage(randomMessages[Math.floor(Math.random() * randomMessages.length)]);
+        }
+      }, 22000);
+    }
+
+    function startAmbientMusic() {
+      if (!audioContext || musicNodes) return;
+      const masterGain = audioContext.createGain();
+      masterGain.gain.setValueAtTime(0.0001, audioContext.currentTime);
+      masterGain.gain.exponentialRampToValueAtTime(masterVolume * 0.055, audioContext.currentTime + 1.8);
+      masterGain.connect(audioContext.destination);
+      musicNodes = { gain: masterGain, oscillators: [] };
+      [130.81, 196, 261.63].forEach((frequency, index) => {
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.value = frequency;
+        gain.gain.value = index === 0 ? 0.5 : 0.22;
+        oscillator.connect(gain);
+        gain.connect(masterGain);
+        oscillator.start();
+        musicNodes.oscillators.push(oscillator);
+      });
+    }
+
+    function stopAmbientMusic() {
+      if (!musicNodes || !audioContext) return;
+      const now = audioContext.currentTime;
+      musicNodes.gain.gain.cancelScheduledValues(now);
+      musicNodes.gain.gain.setValueAtTime(Math.max(musicNodes.gain.gain.value, 0.0001), now);
+      musicNodes.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
+      const oscillators = musicNodes.oscillators;
+      setTimeout(() => oscillators.forEach((oscillator) => {
+        try { oscillator.stop(); } catch (_) {}
+      }), 760);
+      musicNodes = null;
     }
 
     function startHeartbeatSound() {
@@ -678,7 +800,7 @@ import * as THREE from 'three';
         oscillator.type = 'sine';
         oscillator.frequency.setValueAtTime(index === 0 ? 58 : 48, now + delay);
         gain.gain.setValueAtTime(0.0001, now + delay);
-        gain.gain.exponentialRampToValueAtTime(0.035, now + delay + 0.018);
+        gain.gain.exponentialRampToValueAtTime(0.035 * masterVolume, now + delay + 0.018);
         gain.gain.exponentialRampToValueAtTime(0.0001, now + delay + 0.11);
         oscillator.connect(gain);
         gain.connect(audioContext.destination);
@@ -740,7 +862,7 @@ import * as THREE from 'three';
         hideLetter();
       });
       letterOverlay.addEventListener('pointerdown', (e) => {
-        if (e.target === letterOverlay) hideLetter();
+        if (e.target === letterOverlay) e.preventDefault();
         else e.stopPropagation();
       });
     }
@@ -750,24 +872,10 @@ import * as THREE from 'three';
       e.preventDefault();
       dismissHint();
       clearTimeout(longPressTimer);
-      holdBloom.style.left = `${e.clientX}px`;
-      holdBloom.style.top = `${e.clientY}px`;
-      holdBloom.classList.remove('visible');
-      void holdBloom.offsetWidth;
-      holdBloom.classList.add('visible');
-      longPressTimer = setTimeout(() => {
-        createRoseBurst(e.clientX, e.clientY);
-        showSecretMessage('Some hearts recognize each other without a word.');
-        if (navigator.vibrate) navigator.vibrate([25, 40, 25]);
-      }, 850);
 
       const rect = renderer.domElement.getBoundingClientRect();
       const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       const ny = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-
-      const raycaster = new THREE.Raycaster();
-      const pointerVec = new THREE.Vector2(nx, ny);
-      raycaster.setFromCamera(pointerVec, camera);
 
       let hitHeart = false;
       if (particleSystem) {
@@ -776,6 +884,19 @@ import * as THREE from 'three';
         const dx = nx - heartX;
         const dy = ny - heartY;
         hitHeart = (dx * dx) / 0.42 + (dy * dy) / 0.58 < 1.15;
+      }
+
+      if (hitHeart) {
+        holdBloom.style.left = `${e.clientX}px`;
+        holdBloom.style.top = `${e.clientY}px`;
+        holdBloom.classList.remove('visible');
+        void holdBloom.offsetWidth;
+        holdBloom.classList.add('visible');
+        longPressTimer = setTimeout(() => {
+          createHeartBurst(e.clientX, e.clientY);
+          showSecretMessage('Some hearts recognize each other without a word.');
+          if (navigator.vibrate) navigator.vibrate([25, 40, 25]);
+        }, 850);
       }
 
       tapCandidate = hitHeart;
@@ -822,6 +943,10 @@ import * as THREE from 'three';
       clearTimeout(longPressTimer);
       holdBloom.classList.remove('visible');
       isDragging = false;
+      if (e.type === 'pointercancel') {
+        tapCandidate = false;
+        return;
+      }
 
       if (tapCandidate) {
         const elapsed = performance.now() - tapStartTime;
@@ -834,6 +959,7 @@ import * as THREE from 'three';
             lastHeartTapTime = 0;
             clearTimeout(singleTapTimer);
             createRoseBurst(e.clientX, e.clientY);
+            createHeartBurst(e.clientX, e.clientY);
             showSecretMessage('I love you, Sinu.');
           } else {
             lastHeartTapTime = now;
@@ -857,24 +983,6 @@ import * as THREE from 'three';
     /* ============================================================
        LETTER
     ============================================================ */
-    function typeLetterParagraph() {
-      const paragraph = document.getElementById('typed-paragraph');
-      if (!paragraph || prefersReducedMotion) return;
-      const text = 'If I could choose a peaceful place, it would be wherever you are.';
-      paragraph.textContent = '';
-      let index = 0;
-      const typer = setInterval(() => {
-        if (!letterVisible) {
-          paragraph.textContent = text;
-          clearInterval(typer);
-          return;
-        }
-        paragraph.textContent = text.slice(0, index);
-        index++;
-        if (index > text.length) clearInterval(typer);
-      }, 38);
-    }
-
     function showLetter() {
       letterVisible = true;
       letterOverlay.classList.remove('hidden');
