@@ -1,316 +1,2548 @@
-<!doctype html>
-<html lang="ru">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>i love you</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='35%25' r='70%25'%3E%3Cstop offset='0%25' stop-color='%23ff9abb'/%3E%3Cstop offset='45%25' stop-color='%23ff2d75'/%3E%3Cstop offset='100%25' stop-color='%23b8003d'/%3E%3C/radialGradient%3E%3Cfilter id='s' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeDropShadow dx='0' dy='4' stdDeviation='4' flood-color='%23ff2d75' flood-opacity='.55'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%23050508'/%3E%3Cpath filter='url(%23s)' fill='url(%23g)' d='M32 54S9 40.5 9 23.8C9 15.6 15.1 10 22.2 10c4.4 0 7.8 2 9.8 5.1C34 12 37.4 10 41.8 10 48.9 10 55 15.6 55 23.8 55 40.5 32 54 32 54Z'/%3E%3C/svg%3E" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>The Infinite Love Experience · Sinu</title>
+  <meta name="theme-color" content="#030305" />
+  <meta name="description" content="A cinematic, interactive love universe dedicated to Sinu." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='35%25' r='70%25'%3E%3Cstop offset='0%25' stop-color='%23ff9abb'/%3E%3Cstop offset='45%25' stop-color='%23ff2d75'/%3E%3Cstop offset='100%25' stop-color='%238B001F'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%23030305'/%3E%3Cpath fill='url(%23g)' d='M32 54S9 40.5 9 23.8C9 15.6 15.1 10 22.2 10c4.4 0 7.8 2 9.8 5.1C34 12 37.4 10 41.8 10 48.9 10 55 15.6 55 23.8 55 40.5 32 54 32 54Z'/%3E%3C/svg%3E" />
+
   <style>
+    /* ============ CORE THEME ============ */
     :root {
-      --bg: #050508;
-      --pink: #ff2d75;
-      --pink-soft: #ff7aa8;
-      --red: #ff174f;
-      --white: #fff7fb;
+      --amoled: #030305;
+      --deep-black: #08060A;
+      --crimson: #8B001F;
+      --ruby: #FF174F;
+      --romantic: #FF4D91;
+      --soft-white: #FFF5FA;
+      --rose-gold: #D99A9A;
+      --font-display: "Georgia", "Times New Roman", serif;
+      --font-ui: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      --font-mono: "Cascadia Code", "Fira Code", Consolas, monospace;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-    body {
-      min-height: 100vh;
+    html, body {
+      height: 100%;
+      width: 100%;
       overflow: hidden;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--white);
-      background:
-        radial-gradient(circle at 50% 45%, rgba(255, 45, 117, 0.16), transparent 34%),
-        radial-gradient(circle at 50% 74%, rgba(255, 0, 80, 0.2), transparent 26%),
-        linear-gradient(180deg, #09090f, var(--bg));
+      background: var(--amoled);
+      color: var(--soft-white);
+      font-family: var(--font-ui);
+      overscroll-behavior: none;
+      touch-action: none;
     }
 
+    #app { position: fixed; inset: 0; overflow: hidden; }
+    canvas { display: block; }
 
-
-    .stage {
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      perspective: 900px;
-      padding: 24px 18px;
-    }
-
-    .intro {
-      text-align: center;
-      z-index: 8;
-      transition: opacity 0.45s ease, transform 0.45s ease;
-    }
-
-    .intro.hide {
-      opacity: 0;
-      transform: translateY(16px) scale(0.96);
+    /* ============ CINEMATIC LAYERS ============ */
+    .scene {
+      position: absolute; inset: 0;
+      opacity: 0; visibility: hidden;
+      transition: opacity 1.2s cubic-bezier(.4,0,.2,1), visibility 1.2s;
       pointer-events: none;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .scene.active { opacity: 1; visibility: visible; pointer-events: auto; }
+
+    .grain {
+      position: fixed; inset: -50%;
+      width: 200%; height: 200%;
+      pointer-events: none; z-index: 9000; opacity: 0.05;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grainShift 0.5s steps(3) infinite;
+    }
+    @keyframes grainShift {
+      0% { transform: translate(0,0); }
+      33% { transform: translate(-2%, 1%); }
+      66% { transform: translate(1%, -2%); }
+      100% { transform: translate(0,0); }
     }
 
-    .main-title {
-      font-size: clamp(34px, 7vw, 70px);
-      font-weight: 900;
-      line-height: 1;
-      text-shadow: 0 0 28px rgba(255, 45, 117, 0.7);
+    .vignette {
+      position: fixed; inset: 0; pointer-events: none; z-index: 8000;
+      background: radial-gradient(ellipse at center, transparent 45%, rgba(3,3,5,0.55) 80%, rgba(3,3,5,0.92) 100%);
     }
 
-    .log {
-      margin: 22px auto 0;
-      width: min(560px, 92vw);
-      text-align: left;
-      font-family: "Cascadia Code", Consolas, monospace;
-      font-size: clamp(11px, 2vw, 13px);
-      color: rgba(255, 122, 168, 0.9);
-      line-height: 1.7;
-    }
-
-    .log-line {
+    /* ============ SCENE 1: THE VOID ============ */
+    #scene-void .void-message {
+      font-family: var(--font-display);
+      font-size: clamp(18px, 3.5vw, 30px);
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      font-style: italic;
+      color: var(--rose-gold);
+      text-align: center;
+      padding: 0 24px;
       opacity: 0;
-      transform: translateY(8px);
-      animation: lineIn 0.45s ease forwards;
+      animation: voidReveal 4s ease 3s forwards;
+      text-shadow: 0 0 40px rgba(255,77,145,0.35);
+    }
+    @keyframes voidReveal {
+      0% { opacity: 0; transform: translateY(14px); filter: blur(8px); }
+      100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+    .void-particle {
+      position: absolute; width: 4px; height: 4px; border-radius: 50%;
+      background: var(--ruby);
+      box-shadow: 0 0 12px 3px rgba(255,23,79,0.7), 0 0 40px 8px rgba(255,23,79,0.3);
+      animation: voidParticle 6s ease-in-out infinite;
+    }
+    @keyframes voidParticle {
+      0%, 100% { transform: translate(0,0) scale(1); opacity: 0.9; }
+      25% { transform: translate(30px,-40px) scale(1.4); opacity: 1; }
+      50% { transform: translate(-20px,-70px) scale(0.8); opacity: 0.7; }
+      75% { transform: translate(40px,-30px) scale(1.2); opacity: 1; }
     }
 
-    .log-line:nth-child(2) { animation-delay: 0.45s; }
-    .log-line:nth-child(3) { animation-delay: 0.9s; }
-    .log-line:nth-child(4) { animation-delay: 1.35s; }
-
-    @keyframes lineIn {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    /* ============ SCENE 2: AWAKENING ============ */
+    #scene-awakening .awaken-content {
+      text-align: center; padding: 0 24px; max-width: 720px; z-index: 2;
     }
+    .awaken-title {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 6vw, 54px);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--soft-white);
+      text-shadow: 0 0 40px rgba(255,23,79,0.6), 0 0 90px rgba(255,23,79,0.25);
+      opacity: 0;
+      animation: awakenIn 1.4s ease 0.5s forwards;
+    }
+    .awaken-title .sinu {
+      background: linear-gradient(135deg, #FF9ABB, #D99A9A, #FF4D91);
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 0 26px rgba(255,77,145,0.7));
+    }
+    @keyframes awakenIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.96); filter: blur(10px); }
+      to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+    .terminal-log {
+      margin: 32px auto 0; width: min(540px, 88vw); text-align: left;
+      font-family: var(--font-mono);
+      font-size: clamp(11px, 1.8vw, 13.5px);
+      line-height: 1.9;
+      color: rgba(255,122,168,0.9);
+      border-left: 2px solid rgba(255,23,79,0.35);
+      padding-left: 16px;
+      opacity: 0;
+      animation: awakenIn 1s ease 1.6s forwards;
+    }
+    .terminal-log .line {
+      opacity: 0; transform: translateY(6px);
+      animation: logLine 0.5s ease forwards;
+    }
+    .terminal-log .line:nth-child(1) { animation-delay: 1.9s; }
+    .terminal-log .line:nth-child(2) { animation-delay: 2.3s; }
+    .terminal-log .line:nth-child(3) { animation-delay: 2.7s; }
+    .terminal-log .line:nth-child(4) { animation-delay: 3.1s; }
+    .terminal-log .line:nth-child(5) { animation-delay: 3.5s; }
+    @keyframes logLine { to { opacity: 1; transform: translateY(0); } }
+    .terminal-log .key { color: rgba(217,154,154,0.9); }
+    .terminal-log .sinu-tag { color: #FF4D91; font-weight: 700; }
 
-    .button {
-      margin-top: 22px;
-      border: 0;
-      border-radius: 10px;
-      padding: 13px 24px;
-      color: white;
-      font-size: 14px;
-      font-weight: 800;
+    .btn-premium {
+      display: inline-flex; align-items: center; gap: 10px;
+      margin-top: 34px; border: 0; border-radius: 100px;
+      padding: 16px 38px; color: var(--soft-white);
+      font-family: var(--font-ui);
+      font-size: clamp(13px, 2vw, 15px);
+      font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
       cursor: pointer;
-      background: linear-gradient(135deg, #ff2d75, #b8003d);
-      box-shadow: 0 12px 38px rgba(255, 45, 117, 0.36);
-      opacity: 0;
-      transform: translateY(10px);
-      animation: buttonIn 0.45s ease forwards 2s;
+      background: linear-gradient(135deg, #FF174F, #8B001F);
+      box-shadow: 0 14px 46px rgba(255,23,79,0.42), 0 0 0 1px rgba(255,255,255,0.12) inset;
+      opacity: 0; transform: translateY(12px);
+      animation: awakenIn 1s ease 3.9s forwards;
+      transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s, filter 0.3s;
+      position: relative; overflow: hidden;
     }
-
-    .button:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.08);
+    .btn-premium::before {
+      content: ""; position: absolute; top: 0; left: -120%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+      transform: skewX(-20deg);
+      animation: btnShine 4s ease-in-out infinite;
     }
+    @keyframes btnShine { 0%,100% { left: -120%; } 55% { left: 160%; } }
+    .btn-premium:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 20px 60px rgba(255,23,79,0.6), 0 0 0 1px rgba(255,255,255,0.2) inset; }
+    .btn-premium:active { transform: translateY(0) scale(0.98); }
 
-    @keyframes buttonIn {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .heart-wrap {
-      position: absolute;
-      width: min(92vw, 760px);
-      aspect-ratio: 1 / 0.9;
-      transform-style: preserve-3d;
-      opacity: 0;
+    /* ============ MAIN 3D CANVAS HOST ============ */
+    #stage-canvas {
+      position: absolute; inset: 0; z-index: 1;
+      opacity: 0; transition: opacity 2s ease;
       pointer-events: none;
     }
+    #stage-canvas.active { opacity: 1; pointer-events: auto; }
 
-    .heart-wrap.show {
-      opacity: 1;
-      animation: heartAppear 1.1s ease forwards, beat 1.7s ease-in-out infinite 1.2s;
-    }
-
-    @keyframes heartAppear {
-      from {
-        transform: rotateX(18deg) scale(0.72);
-        filter: blur(6px);
-      }
-      to {
-        transform: rotateX(0deg) scale(1);
-        filter: blur(0);
-      }
-    }
-
-    @keyframes beat {
-      0%, 100% { scale: 1; }
-      14% { scale: 1.035; }
-      28% { scale: 1; }
-      42% { scale: 1.025; }
-      70% { scale: 1; }
-    }
-
-    .heart-word {
+    /* ============ SCENE OVERLAYS ============ */
+    .scene-message {
       position: absolute;
-      left: calc(var(--x) * 1%);
-      top: calc(var(--y) * 1%);
-      font-family: "Cascadia Code", Consolas, monospace;
-      font-size: clamp(7px, 1.3vw, 13px);
-      white-space: nowrap;
-      color: hsl(var(--hue), 100%, var(--light));
-      text-shadow:
-        0 0 7px rgba(255, 45, 117, 0.85),
-        0 0 18px rgba(255, 45, 117, 0.5);
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.2) rotate(var(--rot));
-      animation: wordIn 0.75s cubic-bezier(.2,.9,.2,1.15) forwards;
-      animation-delay: calc(var(--delay) * 1ms);
-    }
-
-    @keyframes wordIn {
-      to {
-        opacity: var(--opacity);
-        transform: translate(-50%, -50%) scale(1) rotate(var(--rot));
-      }
-    }
-
-    .center-text {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      font-size: clamp(34px, 7vw, 72px);
-      font-weight: 950;
-      text-align: center;
-      color: white;
-      text-shadow:
-        0 0 22px rgba(255, 255, 255, 0.5),
-        0 0 46px rgba(255, 45, 117, 0.9);
-      opacity: 0;
-      transform: scale(0.9);
-      animation: centerIn 0.8s ease forwards 1.15s;
-      pointer-events: none;
-    }
-
-    @keyframes centerIn {
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    .glow {
-      position: fixed;
       left: 50%;
-      bottom: 6%;
-      width: min(640px, 90vw);
-      height: 110px;
-      transform: translateX(-50%);
-      background: radial-gradient(ellipse, rgba(255, 45, 117, 0.34), transparent 65%);
-      filter: blur(18px);
+      bottom: max(9%, calc(var(--safe-bottom) + 30px));
+      transform: translateX(-50%) translateY(20px);
+      z-index: 3; text-align: center; opacity: 0;
+      transition: opacity 1.2s ease, transform 1.2s cubic-bezier(.4,0,.2,1);
       pointer-events: none;
-      opacity: 0.85;
+      width: max-content; max-width: 92vw; padding: 0 16px;
+    }
+    .scene-message.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .scene-message .msg-text {
+      font-family: var(--font-display); font-style: italic;
+      font-size: clamp(18px, 3.6vw, 34px);
+      font-weight: 400; letter-spacing: 0.03em;
+      color: var(--soft-white);
+      text-shadow: 0 0 30px rgba(255,77,145,0.55), 0 0 70px rgba(255,23,79,0.3);
+    }
+    .scene-message .msg-text .sinu {
+      background: linear-gradient(135deg, #FF9ABB, #D99A9A, #FF4D91);
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent; font-weight: 700;
     }
 
-    @media (max-width: 520px) {
-      .heart-wrap {
-        width: 106vw;
-      }
+    .scene-tag {
+      position: absolute;
+      top: max(6%, calc(var(--safe-top) + 24px));
+      left: 50%; transform: translateX(-50%);
+      z-index: 3;
+      font-family: var(--font-mono);
+      font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase;
+      color: rgba(217,154,154,0.55);
+      opacity: 0; transition: opacity 1.4s ease;
+      pointer-events: none; white-space: nowrap;
+    }
+    .scene-tag.show { opacity: 1; }
 
-      .heart-word {
-        font-size: 7px;
+    /* ============ PORTAL SCENE ============ */
+    #scene-portal .portal-core {
+      position: relative; width: min(340px, 70vw); aspect-ratio: 1;
+      display: grid; place-items: center; z-index: 2;
+    }
+    .portal-ring {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 1.5px solid rgba(255,77,145,0.35);
+      box-shadow: 0 0 60px rgba(255,23,79,0.5), inset 0 0 60px rgba(255,23,79,0.25);
+      animation: portalPulse 3s ease-in-out infinite;
+    }
+    .portal-ring:nth-child(2) {
+      inset: 14%; border-color: rgba(217,154,154,0.3);
+      animation-delay: -1s; animation-duration: 3.6s;
+    }
+    .portal-ring:nth-child(3) {
+      inset: 30%; border-color: rgba(255,154,171,0.35);
+      animation-delay: -2s; animation-duration: 4.2s;
+    }
+    @keyframes portalPulse {
+      0%,100% { transform: scale(1); opacity: 0.75; }
+      50% { transform: scale(1.05); opacity: 1; }
+    }
+    .portal-heart {
+      font-size: clamp(46px, 10vw, 80px);
+      color: #FF4D91;
+      text-shadow: 0 0 40px rgba(255,23,79,0.9), 0 0 90px rgba(255,23,79,0.5);
+      animation: portalBeat 1.6s ease-in-out infinite;
+      z-index: 3;
+    }
+    @keyframes portalBeat {
+      0%,100% { transform: scale(1); }
+      14% { transform: scale(1.08); }
+      28% { transform: scale(1); }
+      42% { transform: scale(1.05); }
+    }
+    .portal-label {
+      position: absolute; bottom: -60px; left: 50%; transform: translateX(-50%);
+      font-family: var(--font-mono); font-size: 10px;
+      letter-spacing: 0.4em; text-transform: uppercase;
+      color: rgba(217,154,154,0.7); white-space: nowrap;
+      animation: hintPulse 2.4s ease-in-out infinite;
+    }
+    @keyframes hintPulse { 0%,100% { opacity: 0.45; } 50% { opacity: 0.95; } }
+
+    /* ============ ROSE GARDEN ============ */
+    #scene-rose .rose-canvas { position: absolute; inset: 0; z-index: 1; }
+
+    /* ============ LETTER ============ */
+    #scene-letter .envelope-wrap {
+      position: relative; z-index: 4; perspective: 1200px;
+      display: grid; place-items: center; padding: 20px;
+      width: 100%; height: 100%;
+    }
+    .envelope {
+      width: min(320px, 78vw); aspect-ratio: 1.6 / 1;
+      position: relative; cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(.4,0,.2,1);
+      filter: drop-shadow(0 20px 50px rgba(255,23,79,0.28));
+    }
+    .envelope:hover { transform: translateY(-6px) rotateX(4deg); }
+    .envelope-body {
+      position: absolute; inset: 0; border-radius: 8px;
+      background: linear-gradient(150deg, #1a0d12, #2a0f18);
+      border: 1px solid rgba(217,154,154,0.25);
+      box-shadow: inset 0 0 40px rgba(139,0,31,0.5), 0 0 30px rgba(255,23,79,0.15);
+    }
+    .envelope-flap {
+      position: absolute; top: 0; left: 0; right: 0; height: 55%;
+      transform-origin: top center; transform: rotateX(0deg);
+      transition: transform 1s cubic-bezier(.6,0,.2,1);
+      background: linear-gradient(180deg, #241019, #1a0d12);
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      border-radius: 8px 8px 0 0;
+      border: 1px solid rgba(217,154,154,0.2); border-bottom: 0;
+      z-index: 2;
+    }
+    .envelope.open .envelope-flap { transform: rotateX(180deg); }
+    .envelope-seal {
+      position: absolute; left: 50%; top: 52%;
+      width: 44px; height: 44px; transform: translate(-50%,-50%);
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #FF4D91, #8B001F 70%);
+      box-shadow: 0 0 22px rgba(255,23,79,0.65), inset 0 0 12px rgba(0,0,0,0.4);
+      z-index: 3; display: grid; place-items: center;
+      font-size: 18px; color: #FFD7E4;
+      transition: opacity 0.5s, transform 0.5s;
+      font-family: var(--font-display); font-style: italic;
+    }
+    .envelope.open .envelope-seal { opacity: 0; transform: translate(-50%,-50%) scale(0.4) rotate(30deg); }
+    .envelope-hint {
+      position: absolute; bottom: -54px; left: 50%; transform: translateX(-50%);
+      font-family: var(--font-mono); font-size: 11px;
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: rgba(217,154,154,0.6); white-space: nowrap;
+      animation: hintPulse 2.4s ease-in-out infinite;
+    }
+
+    .letter-paper {
+      position: absolute; inset: 0; display: grid; place-items: center;
+      z-index: 5; opacity: 0; visibility: hidden;
+      transition: opacity 1s ease 0.6s, visibility 1s ease 0.6s;
+      pointer-events: none; padding: 20px;
+    }
+    .letter-paper.show { opacity: 1; visibility: visible; pointer-events: auto; }
+    .letter-inner {
+      width: min(560px, 90vw); max-height: 82vh; overflow-y: auto;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,77,145,0.08), transparent 55%),
+        linear-gradient(160deg, #150a0f, #0c0709);
+      border: 1px solid rgba(217,154,154,0.22);
+      border-radius: 10px;
+      padding: clamp(26px, 5vw, 52px);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 0 60px rgba(139,0,31,0.25);
+      position: relative; scrollbar-width: thin;
+      scrollbar-color: rgba(255,77,145,0.3) transparent;
+    }
+    .letter-inner::-webkit-scrollbar { width: 5px; }
+    .letter-inner::-webkit-scrollbar-thumb { background: rgba(255,77,145,0.3); border-radius: 4px; }
+    .letter-heading {
+      font-family: var(--font-display); font-style: italic;
+      font-size: clamp(22px, 4.5vw, 32px);
+      color: var(--rose-gold); margin-bottom: 22px;
+      text-shadow: 0 0 26px rgba(255,77,145,0.3);
+    }
+    .letter-heading .sinu {
+      background: linear-gradient(135deg, #FF9ABB, #D99A9A);
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent;
+    }
+    .letter-body {
+      font-family: var(--font-display);
+      font-size: clamp(14px, 2.4vw, 17px);
+      line-height: 2; color: rgba(255,245,250,0.86);
+      letter-spacing: 0.01em; white-space: pre-wrap; min-height: 120px;
+    }
+    .letter-caret {
+      display: inline-block; width: 2px; height: 1.1em;
+      background: var(--romantic); vertical-align: -2px; margin-left: 2px;
+      animation: caretBlink 0.8s steps(1) infinite;
+      box-shadow: 0 0 8px rgba(255,77,145,0.8);
+    }
+    @keyframes caretBlink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+    .letter-sign {
+      margin-top: 26px; font-family: var(--font-display); font-style: italic;
+      font-size: clamp(15px, 2.6vw, 19px);
+      color: var(--romantic); text-align: right;
+      opacity: 0; transition: opacity 1s ease;
+    }
+    .letter-sign.show { opacity: 1; }
+    .letter-actions {
+      margin-top: 30px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end;
+    }
+    .btn-ghost {
+      background: transparent; border: 1px solid rgba(217,154,154,0.35);
+      border-radius: 100px; padding: 11px 24px;
+      color: var(--rose-gold); font-family: var(--font-ui);
+      font-size: 12px; font-weight: 600; letter-spacing: 0.12em;
+      text-transform: uppercase; cursor: pointer;
+      transition: all 0.3s ease; white-space: nowrap;
+    }
+    .btn-ghost:hover {
+      border-color: var(--romantic); color: var(--soft-white);
+      box-shadow: 0 0 22px rgba(255,77,145,0.3); transform: translateY(-1px);
+    }
+    .btn-ghost:active { transform: translateY(0) scale(0.97); }
+
+    /* ============ FINAL ============ */
+    #scene-final .final-content {
+      position: relative; z-index: 4; text-align: center;
+      padding: 0 24px; display: flex; flex-direction: column;
+      align-items: center; gap: 22px;
+    }
+    .final-main {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 8.5vw, 84px);
+      font-weight: 700; letter-spacing: 0.02em; line-height: 1.1;
+      color: var(--soft-white);
+      text-shadow: 0 0 50px rgba(255,23,79,0.7), 0 0 120px rgba(255,23,79,0.35);
+      opacity: 0; transform: scale(0.86);
+      transition: opacity 2s ease, transform 2s cubic-bezier(.2,.9,.2,1);
+    }
+    .final-main.show { opacity: 1; transform: scale(1); }
+    .final-main .sinu {
+      display: inline-block;
+      background: linear-gradient(135deg, #FF9ABB, #D99A9A, #FF4D91, #FF9ABB);
+      background-size: 300% 300%;
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent;
+      animation: gradientFlow 5s ease infinite;
+      filter: drop-shadow(0 0 40px rgba(255,77,145,0.7));
+    }
+    @keyframes gradientFlow {
+      0%,100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    .final-sub {
+      font-family: var(--font-display); font-style: italic;
+      font-size: clamp(16px, 3.2vw, 28px);
+      color: var(--rose-gold); letter-spacing: 0.04em;
+      opacity: 0; transition: opacity 2s ease 1s;
+      text-shadow: 0 0 30px rgba(255,77,145,0.4);
+    }
+    .final-sub.show { opacity: 1; }
+
+    /* ============ HUD ============ */
+    .hud {
+      position: fixed; z-index: 7000; display: flex; gap: 8px;
+      pointer-events: auto; opacity: 0; transition: opacity 0.8s ease;
+    }
+    .hud.show { opacity: 1; }
+    .hud-top-right {
+      top: max(16px, calc(var(--safe-top) + 12px));
+      right: max(16px, calc(var(--safe-right) + 12px));
+    }
+    .hud-btn {
+      width: 42px; height: 42px; border-radius: 50%;
+      border: 1px solid rgba(217,154,154,0.22);
+      background: rgba(8,6,10,0.55);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      color: var(--rose-gold); cursor: pointer;
+      display: grid; place-items: center;
+      transition: all 0.25s ease; font-size: 16px; user-select: none;
+    }
+    .hud-btn:hover, .hud-btn:focus-visible {
+      border-color: rgba(255,77,145,0.6); color: var(--soft-white);
+      box-shadow: 0 0 20px rgba(255,23,79,0.35);
+      transform: scale(1.06); outline: none;
+    }
+    .hud-btn:active { transform: scale(0.94); }
+    .hud-btn svg { width: 18px; height: 18px; fill: currentColor; pointer-events: none; }
+    .hud-btn.muted { color: rgba(217,154,154,0.35); }
+
+    /* Progress rail */
+    .progress-rail {
+      position: fixed; top: max(16px, calc(var(--safe-top) + 12px));
+      left: 50%; transform: translateX(-50%);
+      z-index: 7000; display: flex; gap: 7px; align-items: center;
+      opacity: 0; transition: opacity 0.8s ease; pointer-events: auto;
+    }
+    .progress-rail.show { opacity: 1; }
+    .progress-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(217,154,154,0.25);
+      transition: all 0.5s ease; cursor: pointer;
+    }
+    .progress-dot.active {
+      background: var(--romantic);
+      box-shadow: 0 0 12px rgba(255,77,145,0.9);
+      transform: scale(1.5);
+    }
+    .progress-dot.done { background: rgba(255,77,145,0.6); }
+
+    /* Cursor glow */
+    .cursor-glow {
+      position: fixed; width: 320px; height: 320px;
+      border-radius: 50%; pointer-events: none; z-index: 8500;
+      background: radial-gradient(circle, rgba(255,45,117,0.12), transparent 65%);
+      transform: translate(-50%, -50%);
+      transition: opacity 0.4s ease; opacity: 0;
+      mix-blend-mode: screen;
+    }
+    .cursor-glow.active { opacity: 1; }
+    @media (pointer: coarse) { .cursor-glow { display: none; } }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(3,3,5,0.82);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      z-index: 9500; display: grid; place-items: center;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.4s ease, visibility 0.4s;
+      padding: 20px;
+    }
+    .modal-backdrop.show { opacity: 1; visibility: visible; }
+    .modal {
+      width: min(480px, 94vw); max-height: 86vh; overflow-y: auto;
+      background: linear-gradient(160deg, #120a0e, #080609);
+      border: 1px solid rgba(217,154,154,0.25);
+      border-radius: 16px; padding: 28px;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.8), inset 0 0 60px rgba(139,0,31,0.15);
+      color: var(--soft-white);
+      scrollbar-width: thin; scrollbar-color: rgba(255,77,145,0.3) transparent;
+    }
+    .modal h3 {
+      font-family: var(--font-display); font-style: italic;
+      font-size: 24px; font-weight: 400;
+      color: var(--rose-gold); margin-bottom: 20px; letter-spacing: 0.02em;
+    }
+    .modal label {
+      display: block; font-family: var(--font-mono);
+      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(217,154,154,0.6); margin: 16px 0 6px;
+    }
+    .modal input, .modal textarea {
+      width: 100%; background: rgba(3,3,5,0.7);
+      border: 1px solid rgba(217,154,154,0.2);
+      border-radius: 8px; padding: 11px 13px;
+      color: var(--soft-white); font-family: var(--font-ui);
+      font-size: 14px;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      resize: vertical;
+    }
+    .modal input:focus, .modal textarea:focus {
+      outline: none; border-color: rgba(255,77,145,0.6);
+      box-shadow: 0 0 0 3px rgba(255,23,79,0.12);
+    }
+    .modal textarea { min-height: 100px; line-height: 1.6; }
+    .modal .modal-actions {
+      display: flex; gap: 10px; justify-content: flex-end;
+      margin-top: 26px; flex-wrap: wrap;
+    }
+    .modal::-webkit-scrollbar { width: 5px; }
+    .modal::-webkit-scrollbar-thumb { background: rgba(255,77,145,0.3); border-radius: 4px; }
+
+    /* Volume slider (in HUD) */
+    .volume-wrap {
+      display: flex; align-items: center; gap: 8px;
+      padding: 0 14px; border-radius: 100px;
+      border: 1px solid rgba(217,154,154,0.22);
+      background: rgba(8,6,10,0.55);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      height: 42px;
+    }
+    .volume-wrap input[type=range] {
+      -webkit-appearance: none; appearance: none;
+      width: 70px; height: 3px;
+      background: rgba(217,154,154,0.25); border-radius: 2px;
+      outline: none; cursor: pointer;
+    }
+    .volume-wrap input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--romantic); box-shadow: 0 0 10px rgba(255,77,145,0.8);
+      cursor: pointer;
+    }
+    .volume-wrap input[type=range]::-moz-range-thumb {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--romantic); border: 0;
+      box-shadow: 0 0 10px rgba(255,77,145,0.8); cursor: pointer;
+    }
+
+    /* Music visualizer */
+    #visualizer {
+      position: fixed; bottom: 0; left: 0;
+      width: 100%; height: 70px; z-index: 6500;
+      pointer-events: none; opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+    #visualizer.show { opacity: 0.85; }
+
+    /* Hidden star secret toast */
+    .secret-toast {
+      position: fixed; left: 50%; top: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      z-index: 9200; pointer-events: none;
+      background: rgba(8,6,10,0.92);
+      border: 1px solid rgba(255,77,145,0.4);
+      border-radius: 14px; padding: 22px 30px;
+      font-family: var(--font-display); font-style: italic;
+      font-size: clamp(15px, 3vw, 20px); color: var(--rose-gold);
+      text-align: center; max-width: 80vw;
+      box-shadow: 0 0 50px rgba(255,23,79,0.35);
+      opacity: 0; transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .secret-toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    .secret-toast .sinu { color: #FF4D91; font-weight: 700; font-style: normal; }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
       }
+    }
+
+    @media (max-width: 600px) {
+      .hud-btn { width: 38px; height: 38px; font-size: 14px; }
+      .hud-btn svg { width: 16px; height: 16px; }
+      .volume-wrap { height: 38px; padding: 0 10px; }
+      .volume-wrap input[type=range] { width: 50px; }
+      .progress-rail { gap: 5px; }
+      .progress-dot { width: 5px; height: 5px; }
+      .letter-actions { justify-content: center; }
+      .btn-ghost { padding: 10px 18px; font-size: 11px; }
+      .hud-top-right { gap: 5px; }
     }
   </style>
 </head>
 <body>
-  <main class="stage" id="stage">
-    <section class="intro" id="intro">
-      <h1 class="main-title">Love you.</h1>
-      <div class="log">
-        <div class="log-line">[system] Initializing HEART_PROTOCOL_v2.0...</div>
-        <div class="log-line">[status] Loading memory fragments...</div>
-        <div class="log-line">[fonts] Preloading custom heart font for you...</div>
-        <div class="log-line">[ready] One message is waiting.</div>
-      </div>
-      <button class="button" id="startBtn">ACCEPT MESSAGE</button>
+  <div id="app">
+    <div class="grain" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+    <canvas id="stage-canvas"></canvas>
+
+    <!-- SCENE 01: VOID -->
+    <section class="scene active" id="scene-void" aria-label="The Void">
+      <div class="void-particle" style="left:50%; top:48%;"></div>
+      <p class="void-message">Something beautiful is waiting for <span style="color:#FF4D91; font-weight:600;">Sinu</span>...</p>
     </section>
 
-    <section class="heart-wrap" id="heart"></section>
-    <div class="glow"></div>
-  </main>
+    <!-- SCENE 02: AWAKENING -->
+    <section class="scene" id="scene-awakening" aria-label="The Awakening">
+      <div class="awaken-content">
+        <h1 class="awaken-title">THIS IS FOR <span class="sinu">SINU</span>.</h1>
+        <div class="terminal-log">
+          <div class="line"><span class="key">[system]</span> Initializing LOVE_PROTOCOL...</div>
+          <div class="line"><span class="key">[heart]</span> Establishing emotional connection...</div>
+          <div class="line"><span class="key">[particles]</span> Creating infinite memories...</div>
+          <div class="line"><span class="key">[identity]</span> Dedicated to <span class="sinu-tag">SINU</span>.</div>
+          <div class="line"><span class="key">[status]</span> EXPERIENCE READY.</div>
+        </div>
+        <button class="btn-premium" id="beginBtn">Begin the Experience</button>
+      </div>
+    </section>
 
-  <script>
-    const heart = document.getElementById("heart");
-    const intro = document.getElementById("intro");
-    const startBtn = document.getElementById("startBtn");
-    const stage = document.getElementById("stage");
+    <!-- SCENE 03: PORTAL -->
+    <section class="scene" id="scene-portal" aria-label="The Portal">
+      <div class="portal-core">
+        <div class="portal-ring"></div>
+        <div class="portal-ring"></div>
+        <div class="portal-ring"></div>
+        <div class="portal-heart">♥</div>
+        <div class="portal-label">entering another dimension</div>
+      </div>
+    </section>
 
-    const words = ["I love you", "love you", "forever", "my heart", "<3"];
-    const points = [];
-    const step = 0.105;
+    <!-- SCENES 04-06, 09 overlay messages -->
+    <div class="scene-tag" id="sceneTag"></div>
+    <div class="scene-message" id="msgLiving">
+      <div class="msg-text"><span class="sinu">Sinu</span>, You Are My Universe.</div>
+    </div>
+    <div class="scene-message" id="msgUniverse">
+      <div class="msg-text">Every star reminds me of <span class="sinu">Sinu</span>.</div>
+    </div>
+    <div class="scene-message" id="msgMemory">
+      <div class="msg-text">Even a thousand pieces cannot change what my heart feels for <span class="sinu">Sinu</span>.</div>
+    </div>
 
-    for (let y = 1.35; y >= -1.25; y -= step) {
-      for (let x = -1.45; x <= 1.45; x += step) {
-        const v = Math.pow(x * x + y * y - 1, 3) - x * x * Math.pow(y, 3);
-        if (v <= 0) {
-          const px = 50 + x * 31;
-          const py = 53 - y * 35;
-          const centerBoost = 1 - Math.min(1, Math.hypot(x, y) / 1.55);
-          points.push({ x: px, y: py, boost: centerBoost });
+    <!-- SCENE 07: ROSE GARDEN -->
+    <section class="scene" id="scene-rose" aria-label="The Rose Garden">
+      <canvas class="rose-canvas" id="roseCanvas"></canvas>
+      <div class="scene-message show" id="msgRose" style="bottom: max(11%, calc(var(--safe-bottom) + 40px));">
+        <div class="msg-text">Every rose is for <span class="sinu">Sinu</span>.</div>
+      </div>
+    </section>
+
+    <!-- SCENE 08: LETTER -->
+    <section class="scene" id="scene-letter" aria-label="The Secret Letter">
+      <div class="envelope-wrap" id="envelopeWrap">
+        <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Open the secret letter">
+          <div class="envelope-body"></div>
+          <div class="envelope-flap"></div>
+          <div class="envelope-seal">S</div>
+          <div class="envelope-hint">open the letter</div>
+        </div>
+        <div class="letter-paper" id="letterPaper">
+          <div class="letter-inner">
+            <div class="letter-heading">My Dearest <span class="sinu">Sinu</span>...</div>
+            <div class="letter-body" id="letterBody"></div>
+            <div class="letter-sign" id="letterSign">Forever yours.</div>
+            <div class="letter-actions">
+              <button class="btn-ghost" id="replayType">Replay</button>
+              <button class="btn-ghost" id="letterContinue">Continue</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENE 09: FINAL -->
+    <section class="scene" id="scene-final" aria-label="Final Surprise">
+      <div class="final-content">
+        <div class="final-main" id="finalMain">I LOVE YOU, <span class="sinu">SINU</span>.</div>
+        <div class="final-sub" id="finalSub">Forever and Always, Sinu.</div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:14px; opacity:0; transition:opacity 1.4s ease 2.4s;" id="finalActions">
+          <button class="btn-ghost" id="replayAll">Replay Experience</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HUD -->
+    <div class="progress-rail" id="progressRail" aria-label="Scene progress"></div>
+
+    <div class="hud hud-top-right" id="hudTopRight">
+      <div class="volume-wrap" id="volumeWrap" title="Volume">
+        <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:var(--rose-gold);flex-shrink:0;"><path d="M3 9v6h4l5 5V4L7 9H3z"/></svg>
+        <input type="range" id="volumeSlider" min="0" max="100" value="80" aria-label="Volume" />
+      </div>
+      <button class="hud-btn" id="soundBtn" aria-label="Toggle sound" title="Sound">
+        <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+      </button>
+      <button class="hud-btn" id="fsBtn" aria-label="Toggle fullscreen" title="Fullscreen">
+        <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      </button>
+      <button class="hud-btn" id="customBtn" aria-label="Customize" title="Customize">
+        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+      </button>
+      <button class="hud-btn" id="restartBtn" aria-label="Restart" title="Restart">
+        <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+      </button>
+    </div>
+
+    <!-- Music visualizer -->
+    <canvas id="visualizer" aria-hidden="true"></canvas>
+
+    <!-- Customization modal -->
+    <div class="modal-backdrop" id="customModal">
+      <div class="modal" role="dialog" aria-modal="true" aria-label="Customize experience">
+        <h3>Personalize for Sinu</h3>
+        <label for="inpRecipient">Recipient name</label>
+        <input id="inpRecipient" type="text" placeholder="Sinu" value="Sinu" maxlength="24" />
+        <label for="inpSender">Sender name</label>
+        <input id="inpSender" type="text" placeholder="Your name" maxlength="24" />
+        <label for="inpTitle">Main title</label>
+        <input id="inpTitle" type="text" placeholder="Love you, Sinu." maxlength="60" />
+        <label for="inpLetter">Secret letter</label>
+        <textarea id="inpLetter" placeholder="My Dearest Sinu..."></textarea>
+        <label for="inpFinal">Final message</label>
+        <input id="inpFinal" type="text" placeholder="I LOVE YOU, SINU." maxlength="60" />
+        <div class="modal-actions">
+          <button class="btn-ghost" id="customReset">Reset</button>
+          <button class="btn-ghost" id="customCancel">Cancel</button>
+          <button class="btn-premium" id="customSave" style="animation:none; opacity:1; transform:none; padding:11px 26px; font-size:12px;">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THREE.JS -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+  import * as THREE from 'three';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+  import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+  import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+  import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+  /* ============================================================
+     SAFE UTILS
+  ============================================================ */
+  const safeText = (t) => String(t ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+  const safeHTML = (t) => String(t ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ============================================================
+     STORAGE / CONFIG
+  ============================================================ */
+  const STORAGE_KEY = 'infinite-love-sinu-v2';
+  const defaults = {
+    recipient: 'Sinu',
+    sender: 'Me',
+    title: 'Love you, Sinu.',
+    letter: `I don't know how to explain what happened to me the day you arrived.\n\nThe world was ordinary, and then suddenly it wasn't. Colors became deeper, silence became softer, and every small thing started to feel like it was pointing back to you.\n\nIf I could give you one thing, it would be the ability to see yourself through my eyes — only then would you understand how extraordinary you are to me. You are my calm and my chaos, my favorite thought and my safest place.\n\nI love you, Sinu. Not in a small way. Not in a way that fades. In the way that stars keep burning long after we've stopped looking at them.\n\nThank you for existing.`,
+    final: 'I LOVE YOU, SINU.',
+    volume: 0.8,
+  };
+
+  function loadConfig() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return { ...defaults };
+      const saved = JSON.parse(raw);
+      return { ...defaults, ...saved };
+    } catch (e) { return { ...defaults }; }
+  }
+  function saveConfig(cfg) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg)); } catch (e) {}
+  }
+  let CONFIG = loadConfig();
+
+  /* ============================================================
+     AUDIO ENGINE
+  ============================================================ */
+  const AudioEngine = {
+    ctx: null, master: null, musicGain: null, sfxGain: null, analyser: null,
+    started: false, muted: false, musicNodes: [], heartbeatInterval: null,
+    initialized: false, masterVolume: CONFIG.volume ?? 0.8,
+
+    init() {
+      if (this.initialized) return;
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        this.ctx = new AC();
+        this.master = this.ctx.createGain();
+        this.master.gain.value = this.masterVolume;
+        this.master.connect(this.ctx.destination);
+
+        this.musicGain = this.ctx.createGain();
+        this.musicGain.gain.value = 0.0;
+        this.musicGain.connect(this.master);
+
+        this.sfxGain = this.ctx.createGain();
+        this.sfxGain.gain.value = 0.7;
+        this.sfxGain.connect(this.master);
+
+        // Analyser for visualizer
+        this.analyser = this.ctx.createAnalyser();
+        this.analyser.fftSize = 256;
+        this.analyser.smoothingTimeConstant = 0.85;
+        this.master.connect(this.analyser);
+
+        this.initialized = true;
+      } catch (e) { console.warn('Audio init failed', e); }
+    },
+
+    resume() {
+      if (!this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume().catch(()=>{});
+    },
+
+    setVolume(v) {
+      this.masterVolume = Math.max(0, Math.min(1, v));
+      if (this.master) {
+        this.master.gain.setTargetAtTime(this.masterVolume, this.ctx.currentTime, 0.1);
+      }
+    },
+
+    startMusic() {
+      if (!this.initialized || this.started || this.muted) return;
+      this.started = true;
+      this.musicGain.gain.setTargetAtTime(0.22, this.ctx.currentTime, 1.5);
+
+      const drone = this.ctx.createOscillator();
+      drone.type = 'sine'; drone.frequency.value = 55;
+      const drone2 = this.ctx.createOscillator();
+      drone2.type = 'sine'; drone2.frequency.value = 55.5;
+      const droneGain = this.ctx.createGain(); droneGain.gain.value = 0.35;
+      const droneFilter = this.ctx.createBiquadFilter();
+      droneFilter.type = 'lowpass'; droneFilter.frequency.value = 180;
+      drone.connect(droneFilter); drone2.connect(droneFilter);
+      droneFilter.connect(droneGain); droneGain.connect(this.musicGain);
+      drone.start(); drone2.start();
+      this.musicNodes.push(drone, drone2, droneGain, droneFilter);
+
+      const pad = this.ctx.createOscillator();
+      pad.type = 'triangle'; pad.frequency.value = 220;
+      const padGain = this.ctx.createGain(); padGain.gain.value = 0.0;
+      const padFilter = this.ctx.createBiquadFilter();
+      padFilter.type = 'lowpass'; padFilter.frequency.value = 700;
+      pad.connect(padFilter); padFilter.connect(padGain); padGain.connect(this.musicGain);
+      pad.start();
+      this.musicNodes.push(pad, padGain, padFilter);
+
+      const lfo = this.ctx.createOscillator();
+      lfo.frequency.value = 0.07;
+      const lfoGain = this.ctx.createGain();
+      lfoGain.gain.value = 0.06;
+      lfo.connect(lfoGain); lfoGain.connect(padGain.gain);
+      lfo.start();
+      this.musicNodes.push(lfo, lfoGain);
+
+      const notes = [440, 523.25, 659.25, 783.99, 880];
+      let noteIdx = 0;
+      const playNote = () => {
+        if (this.muted || !this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = notes[noteIdx % notes.length] * (Math.random() > 0.5 ? 1 : 0.5);
+        const g = this.ctx.createGain();
+        g.gain.setValueAtTime(0.0001, this.ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.06, this.ctx.currentTime + 1.2);
+        g.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 6);
+        osc.connect(g); g.connect(this.musicGain);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 6.2);
+        noteIdx++;
+        setTimeout(playNote, 5000 + Math.random() * 5000);
+      };
+      setTimeout(playNote, 4000);
+    },
+
+    playHeartbeat() {
+      if (!this.initialized || this.muted) return;
+      const t = this.ctx.currentTime;
+      [0, 0.16].forEach((offset, i) => {
+        const osc = this.ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(72, t + offset);
+        osc.frequency.exponentialRampToValueAtTime(38, t + offset + 0.18);
+        const g = this.ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t + offset);
+        g.gain.exponentialRampToValueAtTime(i === 0 ? 0.55 : 0.32, t + offset + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + offset + 0.32);
+        osc.connect(g); g.connect(this.sfxGain);
+        osc.start(t + offset);
+        osc.stop(t + offset + 0.4);
+      });
+    },
+
+    playChime(freq = 880, dur = 1.2, vol = 0.12) {
+      if (!this.initialized || this.muted) return;
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      osc.type = 'sine'; osc.frequency.value = freq;
+      const g = this.ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      osc.connect(g); g.connect(this.sfxGain);
+      osc.start(t); osc.stop(t + dur + 0.05);
+    },
+
+    playWhoosh() {
+      if (!this.initialized || this.muted) return;
+      const t = this.ctx.currentTime;
+      const bufferSize = this.ctx.sampleRate * 1.2;
+      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2);
+      }
+      const src = this.ctx.createBufferSource();
+      src.buffer = buffer;
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'bandpass'; filter.frequency.value = 900; filter.Q.value = 0.8;
+      const g = this.ctx.createGain(); g.gain.value = 0.18;
+      src.connect(filter); filter.connect(g); g.connect(this.sfxGain);
+      src.start();
+    },
+
+    playExplosion() {
+      if (!this.initialized || this.muted) return;
+      const t = this.ctx.currentTime;
+      const bufferSize = this.ctx.sampleRate * 1.5;
+      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 1.5);
+      }
+      const src = this.ctx.createBufferSource();
+      src.buffer = buffer;
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(3000, t);
+      filter.frequency.exponentialRampToValueAtTime(200, t + 1.2);
+      const g = this.ctx.createGain();
+      g.gain.setValueAtTime(0.4, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 1.4);
+      src.connect(filter); filter.connect(g); g.connect(this.sfxGain);
+      src.start(t);
+    },
+
+    setMuted(m) {
+      this.muted = m;
+      if (!this.initialized) return;
+      const now = this.ctx.currentTime;
+      this.master.gain.setTargetAtTime(m ? 0.0 : this.masterVolume, now, 0.3);
+    },
+
+    startHeartbeatLoop() {
+      if (this.heartbeatInterval) return;
+      const beat = () => {
+        this.playHeartbeat();
+        this.heartbeatInterval = setTimeout(beat, 1600);
+      };
+      beat();
+    },
+
+    stopHeartbeatLoop() {
+      if (this.heartbeatInterval) {
+        clearTimeout(this.heartbeatInterval);
+        this.heartbeatInterval = null;
+      }
+    },
+
+    fadeOutAll() {
+      if (!this.initialized) return;
+      const now = this.ctx.currentTime;
+      this.musicGain.gain.setTargetAtTime(0.0, now, 2.0);
+      this.sfxGain.gain.setTargetAtTime(0.0, now, 2.0);
+      this.stopHeartbeatLoop();
+    }
+  };
+
+  /* ============================================================
+     THREE.JS SETUP (safe)
+  ============================================================ */
+  const canvas = document.getElementById('stage-canvas');
+  let renderer = null, scene = null, camera = null, controls = null, composer = null, bloomPass = null;
+  let isWebGLAvailable = false;
+
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x030305, 1);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+    isWebGLAvailable = true;
+  } catch (e) {
+    console.warn('WebGL unavailable:', e);
+    isWebGLAvailable = false;
+  }
+
+  if (isWebGLAvailable) {
+    scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x030305, 0.014);
+
+    camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 500);
+    camera.position.set(0, 0, 30);
+
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.rotateSpeed = 0.7;
+    controls.zoomSpeed = 0.7;
+    controls.enablePan = false;
+    controls.minDistance = 12;
+    controls.maxDistance = 60;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.35;
+    controls.enabled = false;
+
+    composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      1.1, 0.7, 0.22
+    );
+    composer.addPass(bloomPass);
+
+    const ambient = new THREE.AmbientLight(0x2a1220, 1.6);
+    scene.add(ambient);
+    const lightR = new THREE.PointLight(0xFF174F, 180, 90);
+    lightR.position.set(10, 8, 14);
+    scene.add(lightR);
+    const lightP = new THREE.PointLight(0xFF4D91, 90, 80);
+    lightP.position.set(-12, -4, 10);
+    scene.add(lightP);
+    const lightG = new THREE.PointLight(0xD99A9A, 60, 70);
+    lightG.position.set(0, -10, -10);
+    scene.add(lightG);
+
+    window._three = { renderer, scene, camera, controls, composer, bloomPass, lightR, lightP, lightG, ambient };
+  }
+
+  /* ============================================================
+     MATHEMATICALLY ACCURATE HEART GEOMETRY
+     Classic parametric heart curve revolved/extruded for 3D.
+     The 2D silhouette uses the well-known formula:
+       x = 16 sin³(t)
+       y = 13 cos(t) - 5cos(2t) - 2cos(3t) - cos(4t)
+     Normalized and extruded with smooth bevel for volume.
+  ============================================================ */
+  function buildAnatomicalHeartShape() {
+    // Sample the classic heart curve
+    const raw = [];
+    const N = 200;
+    for (let i = 0; i < N; i++) {
+      const t = (i / N) * Math.PI * 2;
+      const x = 16 * Math.pow(Math.sin(t), 3);
+      const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+      raw.push([x, y]);
+    }
+    // Normalize to roughly [-1, 1] range
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    raw.forEach(([x, y]) => {
+      if (x < minX) minX = x; if (x > maxX) maxX = x;
+      if (y < minY) minY = y; if (y > maxY) maxY = y;
+    });
+    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+    const scale = 2 / Math.max(maxX - minX, maxY - minY);
+
+    const shape = new THREE.Shape();
+    raw.forEach(([x, y], i) => {
+      const px = (x - cx) * scale;
+      const py = (y - cy) * scale;
+      if (i === 0) shape.moveTo(px, py);
+      else shape.lineTo(px, py);
+    });
+    shape.closePath();
+    return shape;
+  }
+
+  function buildHeartMesh() {
+    const shape = buildAnatomicalHeartShape();
+    const extrude = new THREE.ExtrudeGeometry(shape, {
+      depth: 0.5,
+      bevelEnabled: true,
+      bevelThickness: 0.18,
+      bevelSize: 0.16,
+      bevelSegments: 12,
+      curveSegments: 96,
+      steps: 2,
+    });
+    extrude.center();
+    extrude.computeVertexNormals();
+    // Scale up to world size
+    extrude.scale(7.5, 7.5, 7.5);
+    // Slight vertical adjustment so the point sits lower
+    extrude.computeBoundingBox();
+    return extrude;
+  }
+
+  /* ============================================================
+     PARTICLE FIELD with physics modes
+  ============================================================ */
+  class ParticleField {
+    constructor(opts = {}) {
+      this.count = opts.count || 1500;
+      this.positions = new Float32Array(this.count * 3);
+      this.colors = new Float32Array(this.count * 3);
+      this.velocities = new Float32Array(this.count * 3);
+      this.targets = new Float32Array(this.count * 3);
+      this.origins = new Float32Array(this.count * 3);
+      this.geometry = new THREE.BufferGeometry();
+      this.material = new THREE.PointsMaterial({
+        size: opts.size || 0.3,
+        vertexColors: true,
+        transparent: true,
+        opacity: opts.opacity ?? 0.9,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true,
+      });
+      this.points = new THREE.Points(this.geometry, this.material);
+      this.geometry.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
+      this.geometry.setAttribute('color', new THREE.BufferAttribute(this.colors, 3));
+      this.mode = 'idle';
+      this.gravityMode = false;
+      this.magneticMode = false;
+    }
+
+    // Heart surface sampling — points lie near the parametric heart shape with depth
+    setHeartShape() {
+      const sampleCount = Math.max(this.count * 3, 4000);
+      const candidates = [];
+      for (let i = 0; i < sampleCount; i++) {
+        const t = Math.random() * Math.PI * 2;
+        const r = Math.pow(Math.random(), 0.55); // bias toward surface
+        const x = 16 * Math.pow(Math.sin(t), 3);
+        const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+        // Normalize to [-1,1]
+        const nx = x / 16;
+        const ny = y / 16;
+        // Depth: outside surface jitter
+        const depthSign = Math.random() > 0.5 ? 1 : -1;
+        const z = depthSign * (0.08 + Math.random() * 0.42);
+        candidates.push([nx * r, ny * r + 0.02, z]);
+      }
+
+      for (let i = 0; i < this.count; i++) {
+        const c = candidates[Math.floor(Math.random() * candidates.length)];
+        const jitter = 0.04;
+        this.targets[i*3]   = c[0] * 9.5 + (Math.random() - 0.5) * jitter;
+        this.targets[i*3+1] = c[1] * 9.5 + (Math.random() - 0.5) * jitter;
+        this.targets[i*3+2] = c[2] * 9.5 + (Math.random() - 0.5) * jitter;
+        const hue = 0.94 + Math.random() * 0.08;
+        const col = new THREE.Color().setHSL(hue, 1, 0.58 + Math.random() * 0.32);
+        this.colors[i*3] = col.r; this.colors[i*3+1] = col.g; this.colors[i*3+2] = col.b;
+      }
+      this.geometry.attributes.color.needsUpdate = true;
+      this.material.size = 0.32;
+      this.mode = 'heart';
+    }
+
+    setUniverseShape() {
+      for (let i = 0; i < this.count; i++) {
+        const r = 25 + Math.random() * 55;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        this.targets[i*3]   = r * Math.sin(phi) * Math.cos(theta);
+        this.targets[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+        this.targets[i*3+2] = r * Math.cos(phi);
+        const col = new THREE.Color().setHSL(0.9 + Math.random()*0.18, 0.75, 0.58 + Math.random()*0.35);
+        this.colors[i*3] = col.r; this.colors[i*3+1] = col.g; this.colors[i*3+2] = col.b;
+      }
+      this.geometry.attributes.color.needsUpdate = true;
+      this.material.size = 0.24;
+      this.mode = 'universe';
+    }
+
+    scatter() {
+      for (let i = 0; i < this.count * 3; i++) {
+        this.positions[i] = (Math.random() - 0.5) * 90;
+      }
+      this.velocities.fill(0);
+      this.geometry.attributes.position.needsUpdate = true;
+    }
+
+    update(dt, attractForce = 0.05) {
+      const pos = this.geometry.attributes.position.array;
+      const vel = this.velocities;
+      const tgt = this.targets;
+      const gravity = this.gravityMode ? -3.2 : 0;
+
+      for (let i = 0; i < this.count; i++) {
+        const i3 = i * 3;
+        // Spring to target
+        const dx = tgt[i3] - pos[i3];
+        const dy = tgt[i3+1] - pos[i3+1];
+        const dz = tgt[i3+2] - pos[i3+2];
+
+        vel[i3]   += dx * attractForce * dt * 60 * 0.02 + (Math.random() - 0.5) * 0.01;
+        vel[i3+1] += dy * attractForce * dt * 60 * 0.02 + gravity * dt * 0.02 + (Math.random() - 0.5) * 0.01;
+        vel[i3+2] += dz * attractForce * dt * 60 * 0.02 + (Math.random() - 0.5) * 0.01;
+
+        // Damping
+        vel[i3]   *= 0.94;
+        vel[i3+1] *= 0.94;
+        vel[i3+2] *= 0.94;
+
+        pos[i3]   += vel[i3];
+        pos[i3+1] += vel[i3+1];
+        pos[i3+2] += vel[i3+2];
+      }
+
+      // Magnetic interaction from mouse (world coordinates)
+      if (this.magneticMode && window._mouseWorld) {
+        const m = window._mouseWorld;
+        for (let i = 0; i < this.count; i++) {
+          const i3 = i * 3;
+          const dx = m.x - pos[i3];
+          const dy = m.y - pos[i3+1];
+          const dz = m.z - pos[i3+2];
+          const d2 = dx*dx + dy*dy + dz*dz;
+          if (d2 < 100) {
+            const f = (100 - d2) / 100 * 0.9;
+            vel[i3]   += dx * f * 0.015;
+            vel[i3+1] += dy * f * 0.015;
+            vel[i3+2] += dz * f * 0.015;
+          }
+        }
+      }
+
+      this.geometry.attributes.position.needsUpdate = true;
+    }
+
+    explode(strength = 1) {
+      const pos = this.geometry.attributes.position.array;
+      const tgt = this.targets;
+      const vel = this.velocities;
+      for (let i = 0; i < this.count; i++) {
+        const i3 = i * 3;
+        const dx = pos[i3] - tgt[i3];
+        const dy = pos[i3+1] - tgt[i3+1];
+        const dz = pos[i3+2] - tgt[i3+2];
+        const len = Math.hypot(dx, dy, dz) || 0.001;
+        const s = (6 + Math.random() * 8) * strength;
+        vel[i3]   += (dx / len) * s;
+        vel[i3+1] += (dy / len) * s;
+        vel[i3+2] += (dz / len) * s;
+      }
+    }
+  }
+
+  // Create particle fields only if WebGL available
+  let heartField = null, universeField = null, starConstellation = null, constellationLines = null, heartGroup = null, glassHeart = null, wireHeart = null, core = null, coreMat = null, wireMat = null;
+
+  if (isWebGLAvailable) {
+    heartField = new ParticleField({ count: 2400, size: 0.3 });
+    heartField.setHeartShape();
+    heartField.scatter();
+    scene.add(heartField.points);
+
+    universeField = new ParticleField({ count: 1400, size: 0.24, opacity: 0.7 });
+    universeField.setUniverseShape();
+    universeField.scatter();
+    scene.add(universeField.points);
+
+    // BUILD THE HEART MESH (accurate shape)
+    heartGroup = new THREE.Group();
+    scene.add(heartGroup);
+
+    const heartGeo = buildHeartMesh();
+
+    // Glass material
+    const glassMat = new THREE.MeshPhysicalMaterial({
+      color: 0xFF174F,
+      metalness: 0.0,
+      roughness: 0.06,
+      transmission: 0.94,
+      thickness: 1.2,
+      ior: 1.46,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.04,
+      attenuationColor: 0x8B001F,
+      attenuationDistance: 2.2,
+      emissive: 0xFF174F,
+      emissiveIntensity: 0.18,
+      transparent: true,
+      opacity: 0.98,
+    });
+    glassHeart = new THREE.Mesh(heartGeo, glassMat);
+    glassHeart.scale.setScalar(0.01);
+    heartGroup.add(glassHeart);
+
+    // Wireframe accent
+    wireMat = new THREE.MeshBasicMaterial({
+      color: 0xFF9ABB,
+      wireframe: true,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+    });
+    wireHeart = new THREE.Mesh(heartGeo, wireMat);
+    wireHeart.scale.setScalar(1.01);
+    heartGroup.add(wireHeart);
+
+    // Core glow
+    const coreGeo = new THREE.SphereGeometry(1.4, 24, 24);
+    coreMat = new THREE.MeshBasicMaterial({
+      color: 0xFF4D91,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    core = new THREE.Mesh(coreGeo, coreMat);
+    heartGroup.add(core);
+
+    // Star constellation heart (for universe scene)
+    starConstellation = new THREE.Group();
+    const constellationGeo = new THREE.BufferGeometry();
+    const constPositions = [];
+    const constellationPoints = [];
+    const N = 90;
+    for (let i = 0; i < N; i++) {
+      const t = (i / N) * Math.PI * 2;
+      const x = 16 * Math.pow(Math.sin(t), 3);
+      const y = 13 * Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t);
+      const nx = x / 16 * 18;
+      const ny = y / 16 * 18;
+      const nz = (Math.random() - 0.5) * 1.5;
+      constPositions.push(nx, ny, nz);
+      constellationPoints.push(new THREE.Vector3(nx, ny, nz));
+    }
+    constellationGeo.setAttribute('position', new THREE.Float32BufferAttribute(constPositions, 3));
+    const constellationMat = new THREE.PointsMaterial({
+      color: 0xFFD7E4, size: 0.9, transparent: true, opacity: 0.95,
+      blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true,
+    });
+    const constellationPointsMesh = new THREE.Points(constellationGeo, constellationMat);
+    starConstellation.add(constellationPointsMesh);
+
+    // Connect nearby stars with thin lines
+    const linePositions = [];
+    for (let i = 0; i < constellationPoints.length; i++) {
+      const a = constellationPoints[i];
+      for (let j = i+1; j < constellationPoints.length; j++) {
+        const b = constellationPoints[j];
+        if (a.distanceTo(b) < 4.2) {
+          linePositions.push(a.x, a.y, a.z, b.x, b.y, b.z);
         }
       }
     }
+    const lineGeo = new THREE.BufferGeometry();
+    lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+    const lineMat = new THREE.LineBasicMaterial({
+      color: 0xFF4D91, transparent: true, opacity: 0.28,
+      blending: THREE.AdditiveBlending,
+    });
+    constellationLines = new THREE.LineSegments(lineGeo, lineMat);
+    starConstellation.add(constellationLines);
+    starConstellation.visible = false;
+    scene.add(starConstellation);
 
-    function makeHeart() {
-      const fragment = document.createDocumentFragment();
+    window._three.heartGroup = heartGroup;
+    window._three.glassHeart = glassHeart;
+    window._three.wireHeart = wireHeart;
+    window._three.core = core;
+  }
 
-      points.forEach((point, index) => {
-        const span = document.createElement("span");
-        span.className = "heart-word";
-        span.textContent = words[(index + Math.floor(point.x)) % words.length];
+  /* ============================================================
+     PORTAL → deeper 3D transition handled via camera zoom in scene
+  ============================================================ */
+  // The actual "portal" is the visual pulse of the heart in the DOM.
+  // In 3D we perform a brief camera push-in when leaving the portal.
 
-        const delay = Math.random() * 900 + point.y * 4;
-        const hue = 336 + Math.random() * 15;
-        const light = 50 + point.boost * 34 + Math.random() * 8;
-        const opacity = 0.56 + point.boost * 0.42;
-        const rot = (Math.random() * 10 - 5).toFixed(2) + "deg";
+  /* ============================================================
+     SCENE CONTROLLER
+  ============================================================ */
+  const Scenes = {
+    current: 'void',
+    order: ['void', 'awakening', 'portal', 'living', 'universe', 'memory', 'rose', 'letter', 'final'],
+    rafId: null,
+    clock: null,
+    elapsed: 0,
+    hasBegun: false,
+    _sceneTimer: null,
+    _livingBeat: null,
+    _finalBeat: null,
+    _voidTimer: null,
+    _heartInStart: 0,
+    _animateHeartIn: false,
 
-        span.style.setProperty("--x", point.x.toFixed(3));
-        span.style.setProperty("--y", point.y.toFixed(3));
-        span.style.setProperty("--delay", delay.toFixed(0));
-        span.style.setProperty("--hue", hue.toFixed(1));
-        span.style.setProperty("--light", light.toFixed(1) + "%");
-        span.style.setProperty("--opacity", opacity.toFixed(2));
-        span.style.setProperty("--rot", rot);
-        fragment.appendChild(span);
+    setProgress(index) {
+      const rail = document.getElementById('progressRail');
+      if (!rail) return;
+      rail.querySelectorAll('.progress-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === index);
+        d.classList.toggle('done', i < index);
+      });
+    },
+
+    buildProgress() {
+      const rail = document.getElementById('progressRail');
+      if (!rail) return;
+      rail.innerHTML = '';
+      this.order.forEach((s, i) => {
+        const d = document.createElement('div');
+        d.className = 'progress-dot';
+        d.title = s;
+        d.addEventListener('click', () => {
+          // Allow navigation to any scene once user has begun
+          if (!this.hasBegun && i > 1) return;
+          this.goTo(s);
+        });
+        rail.appendChild(d);
+      });
+    },
+
+    hideAllOverlays() {
+      document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+      ['msgLiving','msgUniverse','msgMemory','msgRose','sceneTag'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('show');
+      });
+      const lp = document.getElementById('letterPaper');
+      if (lp) lp.classList.remove('show');
+      const env = document.getElementById('envelope');
+      if (env) env.classList.remove('open');
+    },
+
+    enterVoid() {
+      this.hideAllOverlays();
+      const el = document.getElementById('scene-void');
+      if (el) el.classList.add('active');
+      const tag = document.getElementById('sceneTag');
+      if (tag) tag.textContent = '';
+      const rail = document.getElementById('progressRail');
+      if (rail) rail.classList.remove('show');
+      if (isWebGLAvailable) {
+        canvas.classList.remove('active');
+        heartField.points.visible = false;
+        universeField.points.visible = false;
+        heartGroup.visible = false;
+        starConstellation.visible = false;
+      }
+      AudioEngine.startHeartbeatLoop();
+      this.setProgress(0);
+      this.hasBegun = false;
+
+      clearTimeout(this._voidTimer);
+      this._voidTimer = setTimeout(() => this.goTo('awakening'), 9000);
+    },
+
+    enterAwakening() {
+      this.hideAllOverlays();
+      const el = document.getElementById('scene-awakening');
+      if (el) el.classList.add('active');
+      const tag = document.getElementById('sceneTag');
+      if (tag) tag.textContent = '';
+      this.setProgress(1);
+      if (isWebGLAvailable) {
+        canvas.classList.add('active');
+        heartField.points.visible = true;
+        universeField.points.visible = false;
+        heartGroup.visible = true;
+        starConstellation.visible = false;
+        glassHeart.scale.setScalar(0.01);
+        this._animateHeartIn = true;
+        this._heartInStart = performance.now();
+      }
+      // Show HUD once user has progressed
+      document.getElementById('hudTopRight').classList.add('show');
+    },
+
+    enterPortal() {
+      this.hideAllOverlays();
+      this.hasBegun = true;
+      this.setProgress(2);
+      const el = document.getElementById('scene-portal');
+      if (el) el.classList.add('active');
+      const tag = document.getElementById('sceneTag');
+      if (tag) tag.textContent = '';
+      if (isWebGLAvailable) canvas.classList.remove('active');
+      AudioEngine.playWhoosh();
+      AudioEngine.playChime(880, 2.0, 0.1);
+      // Auto-advance to living heart after portal
+      clearTimeout(this._sceneTimer);
+      this._sceneTimer = setTimeout(() => this.goTo('living'), 5200);
+    },
+
+    enterLiving() {
+      this.hideAllOverlays();
+      this.hasBegun = true;
+      this.setProgress(3);
+      const tag = document.getElementById('sceneTag');
+      if (tag) { tag.textContent = 'The Living Heart'; tag.classList.add('show'); }
+      document.getElementById('msgLiving').classList.add('show');
+      canvas.classList.add('active');
+      document.getElementById('progressRail').classList.add('show');
+      if (isWebGLAvailable) {
+        heartField.points.visible = true;
+        universeField.points.visible = false;
+        heartGroup.visible = true;
+        starConstellation.visible = false;
+        glassHeart.scale.setScalar(1);
+        wireHeart.material.opacity = 0.18;
+        coreMat.opacity = 0.3;
+        heartField.setHeartShape();
+        heartField.scatter();
+        heartField.mode = 'heart';
+        controls.enabled = true;
+        controls.autoRotate = true;
+      }
+      AudioEngine.startMusic();
+      this._livingBeat = setInterval(() => AudioEngine.playHeartbeat(), 2600);
+
+      this._scheduleNext('universe', 16000);
+    },
+
+    enterUniverse() {
+      this.hideAllOverlays();
+      this.setProgress(4);
+      const tag = document.getElementById('sceneTag');
+      if (tag) { tag.textContent = 'The Universe of Love'; tag.classList.add('show'); }
+      document.getElementById('msgUniverse').classList.add('show');
+      if (isWebGLAvailable) {
+        heartField.points.visible = true;
+        universeField.points.visible = true;
+        heartGroup.visible = true;
+        starConstellation.visible = true;
+        glassHeart.scale.setScalar(0.85);
+        wireHeart.material.opacity = 0.1;
+        coreMat.opacity = 0.2;
+        heartField.setUniverseShape();
+        heartField.scatter();
+        heartField.mode = 'universe';
+        universeField.setUniverseShape();
+      }
+      controls.autoRotate = true;
+      AudioEngine.playChime(880, 2.5, 0.08);
+      setTimeout(() => AudioEngine.playChime(1174, 2.0, 0.06), 800);
+
+      this._scheduleNext('memory', 17000);
+    },
+
+    enterMemory() {
+      this.hideAllOverlays();
+      this.setProgress(5);
+      const tag = document.getElementById('sceneTag');
+      if (tag) { tag.textContent = 'The Memory Explosion'; tag.classList.add('show'); }
+      document.getElementById('msgMemory').classList.add('show');
+      if (isWebGLAvailable) {
+        heartField.points.visible = true;
+        universeField.points.visible = true;
+        heartGroup.visible = true;
+        starConstellation.visible = false;
+        glassHeart.scale.setScalar(0.85);
+      }
+      AudioEngine.playExplosion();
+      AudioEngine.playWhoosh();
+
+      setTimeout(() => {
+        if (isWebGLAvailable) {
+          heartField.explode(1.6);
+          universeField.explode(0.9);
+        }
+      }, 300);
+      setTimeout(() => {
+        if (isWebGLAvailable) {
+          heartField.explode(1.3);
+          universeField.explode(0.7);
+        }
+      }, 800);
+
+      setTimeout(() => {
+        if (isWebGLAvailable) {
+          heartField.setHeartShape();
+          heartField.mode = 'heart';
+          AudioEngine.playChime(660, 3, 0.1);
+        }
+      }, 4200);
+
+      this._scheduleNext('rose', 12000);
+    },
+
+    enterRose() {
+      this.hideAllOverlays();
+      this.setProgress(6);
+      const tag = document.getElementById('sceneTag');
+      if (tag) { tag.textContent = 'The Rose Garden'; tag.classList.add('show'); }
+      const el = document.getElementById('scene-rose');
+      if (el) el.classList.add('active');
+      if (isWebGLAvailable) {
+        canvas.classList.remove('active');
+        heartField.points.visible = false;
+        universeField.points.visible = false;
+        heartGroup.visible = false;
+        starConstellation.visible = false;
+      }
+      RoseGarden.start();
+      this._scheduleNext('letter', 16000);
+    },
+
+    enterLetter() {
+      this.hideAllOverlays();
+      this.setProgress(7);
+      const tag = document.getElementById('sceneTag');
+      if (tag) { tag.textContent = 'The Secret Letter'; tag.classList.add('show'); }
+      const el = document.getElementById('scene-letter');
+      if (el) el.classList.add('active');
+      RoseGarden.stop();
+      if (isWebGLAvailable) canvas.classList.remove('active');
+      const lp = document.getElementById('letterPaper');
+      if (lp) lp.classList.remove('show');
+      const env = document.getElementById('envelope');
+      if (env) env.classList.remove('open');
+      // Allow manual continue: no auto-advance timer (user reads at own pace)
+      clearTimeout(this._sceneTimer);
+    },
+
+    enterFinal() {
+      this.hideAllOverlays();
+      this.setProgress(8);
+      const el = document.getElementById('scene-final');
+      if (el) el.classList.add('active');
+      const tag = document.getElementById('sceneTag');
+      if (tag) tag.textContent = '';
+      if (isWebGLAvailable) {
+        canvas.classList.add('active');
+        heartField.points.visible = true;
+        universeField.points.visible = true;
+        heartGroup.visible = true;
+        starConstellation.visible = false;
+        heartField.setHeartShape();
+        heartField.scatter();
+        heartField.mode = 'heart';
+        universeField.setUniverseShape();
+        glassHeart.scale.setScalar(1.1);
+        wireHeart.material.opacity = 0.25;
+        coreMat.opacity = 0.35;
+        controls.autoRotate = true;
+      }
+      AudioEngine.playChime(1046, 3, 0.1);
+      setTimeout(() => AudioEngine.playChime(1318, 3, 0.08), 500);
+
+      setTimeout(() => {
+        document.getElementById('finalMain').classList.add('show');
+        AudioEngine.playHeartbeat();
+      }, 600);
+      setTimeout(() => {
+        document.getElementById('finalSub').classList.add('show');
+      }, 2200);
+      setTimeout(() => {
+        document.getElementById('finalActions').style.opacity = '1';
+      }, 3600);
+
+      clearInterval(this._livingBeat);
+      this._finalBeat = setInterval(() => AudioEngine.playHeartbeat(), 1800);
+    },
+
+    goTo(name) {
+      if (this.current === name) return;
+      this.current = name;
+      clearTimeout(this._sceneTimer);
+      clearInterval(this._livingBeat);
+      clearInterval(this._finalBeat);
+      const fn = {
+        void: () => this.enterVoid(),
+        awakening: () => this.enterAwakening(),
+        portal: () => this.enterPortal(),
+        living: () => this.enterLiving(),
+        universe: () => this.enterUniverse(),
+        memory: () => this.enterMemory(),
+        rose: () => this.enterRose(),
+        letter: () => this.enterLetter(),
+        final: () => this.enterFinal(),
+      }[name];
+      if (fn) fn();
+    },
+
+    _scheduleNext(nextName, ms) {
+      clearTimeout(this._sceneTimer);
+      this._sceneTimer = setTimeout(() => this.goTo(nextName), ms);
+    },
+
+    update(dt) {
+      this.elapsed += dt;
+
+      // Heartbeat pulse — subtle scale change only, preserving silhouette
+      if (isWebGLAvailable && heartGroup.visible && glassHeart.scale.x > 0.5) {
+        const beat = Math.pow(Math.max(0, Math.sin(this.elapsed * 1.8)), 8);
+        const pulse = 1 + beat * 0.05;
+        glassHeart.scale.setScalar(pulse);
+        core.scale.setScalar(1 + beat * 0.12);
+        coreMat.opacity = 0.2 + beat * 0.18;
+      }
+
+      // Animate heart appearing in awakening
+      if (isWebGLAvailable && this._animateHeartIn) {
+        const t = Math.min(1, (performance.now() - this._heartInStart) / 1800);
+        const ease = 1 - Math.pow(1 - t, 3);
+        glassHeart.scale.setScalar(0.01 + ease * 1);
+        wireHeart.material.opacity = ease * 0.15;
+        coreMat.opacity = ease * 0.25;
+        if (t >= 1) this._animateHeartIn = false;
+      }
+
+      // Update particle fields
+      if (isWebGLAvailable) {
+        if (heartField.points.visible) heartField.update(dt, 0.06);
+        if (universeField.points.visible) universeField.update(dt, 0.025);
+        if (starConstellation.visible) {
+          starConstellation.rotation.y += dt * 0.06;
+          starConstellation.rotation.x = Math.sin(this.elapsed * 0.2) * 0.05;
+        }
+        // Lights
+        window._three.lightR.position.x = Math.sin(this.elapsed * 0.4) * 14;
+        window._three.lightR.position.y = Math.cos(this.elapsed * 0.3) * 8 + 4;
+        window._three.lightP.position.x = Math.cos(this.elapsed * 0.35) * 14;
+        window._three.lightP.position.z = Math.sin(this.elapsed * 0.45) * 10;
+
+        universeField.points.rotation.y += dt * 0.01;
+        universeField.points.rotation.x += dt * 0.004;
+
+        controls.update();
+      }
+    },
+
+    render() {
+      if (!isWebGLAvailable) return;
+      try { composer.render(); } catch (e) { /* ignore transient render errors */ }
+    },
+
+    loop() {
+      this.rafId = requestAnimationFrame(() => this.loop());
+      const dt = Math.min(this.clock.getDelta(), 0.05);
+      this.update(dt);
+      this.render();
+    },
+
+    start() {
+      this.buildProgress();
+      if (isWebGLAvailable) {
+        this.clock = new THREE.Clock();
+        this.loop();
+      }
+      this.enterVoid();
+      setTimeout(() => {
+        const rail = document.getElementById('progressRail');
+        if (rail) rail.classList.add('show');
+      }, 2000);
+    }
+  };
+
+  /* ============================================================
+     ROSE GARDEN — with real 3D roses (small meshes) in Canvas 2D
+     We keep the 2D canvas for petals/particles but add real 3D roses
+     as WebGL meshes composited in the same scene when possible.
+     For robustness across no-WebGL fallback, we keep a beautiful
+     Canvas 2D rose rendering AND overlay real 3D roses using a second
+     canvas if available. Simpler approach: use the main Three.js scene
+     with rose meshes during the rose scene (visible only then).
+  ============================================================ */
+  // Build 3D roses in Three.js scene
+  let roseGroup = null;
+  if (isWebGLAvailable) {
+    roseGroup = new THREE.Group();
+    roseGroup.visible = false;
+    scene.add(roseGroup);
+
+    // Build a single rose from stacked torus/petal shapes
+    function buildRose() {
+      const group = new THREE.Group();
+      const petals = 14;
+      const layers = 4;
+      const baseMat = new THREE.MeshPhysicalMaterial({
+        color: 0x8B001F,
+        metalness: 0.0,
+        roughness: 0.35,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.1,
+        emissive: 0x4a0010,
+        emissiveIntensity: 0.4,
+        transparent: true,
+        opacity: 0.98,
       });
 
-      const center = document.createElement("div");
-      center.className = "center-text";
-      center.textContent = "Love you.";
-      fragment.appendChild(center);
-
-      heart.innerHTML = "";
-      heart.appendChild(fragment);
+      for (let l = 0; l < layers; l++) {
+        const layerR = 0.7 - l * 0.13;
+        const petalCount = petals - l * 2;
+        for (let p = 0; p < petalCount; p++) {
+          const angle = (p / petalCount) * Math.PI * 2 + l * 0.3;
+          const petalGeo = new THREE.SphereGeometry(layerR, 12, 8);
+          // Flatten into petal shape
+          petalGeo.scale(1, 0.35, 0.55);
+          const petal = new THREE.Mesh(petalGeo, baseMat);
+          petal.position.set(
+            Math.cos(angle) * layerR * 0.65,
+            l * 0.22,
+            Math.sin(angle) * layerR * 0.65
+          );
+          petal.rotation.set(
+            (Math.random() - 0.5) * 0.4,
+            angle,
+            -0.5 + (Math.random() - 0.5) * 0.3
+          );
+          group.add(petal);
+        }
+      }
+      // Green stem hint
+      const stem = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.05, 0.07, 2.2, 6),
+        new THREE.MeshBasicMaterial({ color: 0x1a2e1a, transparent: true, opacity: 0.8 })
+      );
+      stem.position.y = -1.2;
+      group.add(stem);
+      group.scale.setScalar(0.9 + Math.random() * 0.6);
+      group.userData.baseRot = Math.random() * Math.PI * 2;
+      group.userData.phase = Math.random() * Math.PI * 2;
+      return group;
     }
 
-    function showHeart() {
-      makeHeart();
-      intro.classList.add("hide");
-      heart.classList.add("show");
+    const rosePositions = [];
+    for (let i = 0; i < 7; i++) {
+      const rose = buildRose();
+      rose.position.set((i - 3) * 4.2, -2, -3 + (i % 2) * 2);
+      rosePositions.push({ rose, base: rose.position.clone() });
+      roseGroup.add(rose);
     }
+    // Add ambient particles around roses
+    const roseParticleGeo = new THREE.BufferGeometry();
+    const rpPos = new Float32Array(300 * 3);
+    for (let i = 0; i < 300; i++) {
+      rpPos[i*3] = (Math.random() - 0.5) * 30;
+      rpPos[i*3+1] = (Math.random() - 0.5) * 10 - 2;
+      rpPos[i*3+2] = (Math.random() - 0.5) * 10 - 2;
+    }
+    roseParticleGeo.setAttribute('position', new THREE.BufferAttribute(rpPos, 3));
+    const roseParticles = new THREE.Points(roseParticleGeo, new THREE.PointsMaterial({
+      color: 0xFF4D91, size: 0.12, transparent: true, opacity: 0.6,
+      blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true,
+    }));
+    roseGroup.add(roseParticles);
+    roseGroup.userData.particles = roseParticles;
+    window._three.roseGroup = roseGroup;
+    window._three.rosePositions = rosePositions;
+  }
 
-    startBtn.addEventListener("click", showHeart);
+  /* ============================================================
+     ROSE GARDEN (Canvas 2D for petals + interaction)
+  ============================================================ */
+  const RoseGarden = {
+    canvas: null, ctx: null, rafId: null, particles: [], roses: [], running: false,
+    W: 0, H: 0, dpr: 1, _onMove: null, _onClick: null,
 
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") showHeart();
+    init() {
+      if (this.canvas) return;
+      this.canvas = document.getElementById('roseCanvas');
+      if (!this.canvas) return;
+      this.ctx = this.canvas.getContext('2d');
+      this.resize();
+      window.addEventListener('resize', () => this.resize());
+    },
+
+    resize() {
+      if (!this.canvas) return;
+      this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+      this.W = window.innerWidth;
+      this.H = window.innerHeight;
+      this.canvas.width = this.W * this.dpr;
+      this.canvas.height = this.H * this.dpr;
+      this.canvas.style.width = this.W + 'px';
+      this.canvas.style.height = this.H + 'px';
+      this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    },
+
+    makePetal() {
+      return {
+        x: Math.random() * this.W,
+        y: -20 - Math.random() * this.H,
+        size: 8 + Math.random() * 14,
+        speedY: 0.4 + Math.random() * 1.1,
+        speedX: (Math.random() - 0.5) * 0.6,
+        rot: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.02,
+        sway: Math.random() * Math.PI * 2,
+        swaySpeed: 0.01 + Math.random() * 0.02,
+        hue: 340 + Math.random() * 20,
+        opacity: 0.35 + Math.random() * 0.5,
+      };
+    },
+
+    roseMessages: [
+      "You are my calm.",
+      "You are my favorite thought.",
+      "Every petal knows your name, Sinu.",
+      "You make ordinary days feel like poetry.",
+      "My heart beats in your rhythm.",
+      "I would choose you in every lifetime.",
+    ],
+
+    start() {
+      this.init();
+      this.resize();
+      this.running = true;
+      this.particles = [];
+      for (let i = 0; i < 60; i++) this.particles.push(this.makePetal());
+      // Show 3D roses
+      if (isWebGLAvailable && roseGroup) {
+        roseGroup.visible = true;
+        roseGroup.children.forEach(c => {
+          if (c.userData.baseRot !== undefined) c.scale.setScalar(0.9 + Math.random() * 0.6);
+        });
+      }
+      this._bindEvents();
+      this._loop();
+    },
+
+    stop() {
+      this.running = false;
+      if (this.rafId) cancelAnimationFrame(this.rafId);
+      this._unbindEvents();
+      if (isWebGLAvailable && roseGroup) roseGroup.visible = false;
+    },
+
+    _bindEvents() {
+      this._onMove = (e) => {
+        const mx = e.touches ? e.touches[0].clientX : e.clientX;
+        const my = e.touches ? e.touches[0].clientY : e.clientY;
+        this.particles.forEach(p => {
+          const dx = p.x - mx;
+          const dy = p.y - my;
+          const d = Math.hypot(dx, dy);
+          if (d < 160) {
+            const f = (160 - d) / 160 * 0.9;
+            p.x += (dx / (d || 1)) * f * 2.5;
+            p.y += (dy / (d || 1)) * f * 2.5;
+            p.rotSpeed += (Math.random() - 0.5) * 0.05;
+          }
+        });
+      };
+      this._onClick = (e) => {
+        const mx = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+        const my = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+        // Check 3D rose hit via raycasting approx: project rose world pos to screen
+        if (isWebGLAvailable && roseGroup && camera) {
+          roseGroup.children.forEach((c, idx) => {
+            if (c.userData.baseRot === undefined) return;
+            const v = new THREE.Vector3();
+            c.getWorldPosition(v);
+            v.project(camera);
+            const sx = (v.x * 0.5 + 0.5) * window.innerWidth;
+            const sy = (-v.y * 0.5 + 0.5) * window.innerHeight;
+            if (Math.hypot(sx - mx, sy - my) < 80) {
+              AudioEngine.playChime(700 + Math.random() * 300, 1.2, 0.08);
+              this.showRoseMessage(this.roseMessages[idx % this.roseMessages.length]);
+            }
+          });
+        }
+        for (let i = 0; i < 12; i++) {
+          const p = this.makePetal();
+          p.x = mx; p.y = my;
+          p.speedY = (Math.random() - 0.5) * 3;
+          p.speedX = (Math.random() - 0.5) * 3;
+          p.life = 1;
+          this.particles.push(p);
+        }
+      };
+      window.addEventListener('mousemove', this._onMove);
+      window.addEventListener('touchmove', this._onMove, { passive: true });
+      window.addEventListener('click', this._onClick);
+      window.addEventListener('touchstart', this._onClick, { passive: true });
+    },
+
+    _unbindEvents() {
+      if (this._onMove) {
+        window.removeEventListener('mousemove', this._onMove);
+        window.removeEventListener('touchmove', this._onMove);
+      }
+      if (this._onClick) {
+        window.removeEventListener('click', this._onClick);
+        window.removeEventListener('touchstart', this._onClick);
+      }
+    },
+
+    showRoseMessage(text) {
+      const existing = document.getElementById('roseMsgPopup');
+      if (existing) existing.remove();
+      const el = document.createElement('div');
+      el.id = 'roseMsgPopup';
+      el.style.cssText = `
+        position:fixed; left:50%; top:22%; transform:translateX(-50%);
+        font-family:Georgia,serif; font-style:italic; font-size:clamp(16px,3vw,24px);
+        color:#FFD7E4; text-align:center; text-shadow:0 0 24px rgba(255,77,145,0.7);
+        z-index:6000; pointer-events:none; transition:opacity 1s ease; opacity:0;
+        max-width:80vw; padding:0 12px;
+      `;
+      el.textContent = text;
+      document.body.appendChild(el);
+      requestAnimationFrame(() => { el.style.opacity = '1'; });
+      setTimeout(() => {
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 1100);
+      }, 2600);
+    },
+
+    _loop() {
+      if (!this.running) return;
+      this.rafId = requestAnimationFrame(() => this._loop());
+      const ctx = this.ctx;
+      if (!ctx) return;
+      const W = this.W, H = this.H;
+
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, '#030305');
+      grad.addColorStop(0.55, '#0a0508');
+      grad.addColorStop(1, '#15060c');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      const glow = ctx.createRadialGradient(W/2, H*0.75, 20, W/2, H*0.75, W*0.7);
+      glow.addColorStop(0, 'rgba(139,0,31,0.28)');
+      glow.addColorStop(1, 'rgba(139,0,31,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, W, H);
+
+      // Animate 3D roses gently
+      if (isWebGLAvailable && roseGroup && roseGroup.visible) {
+        const t = performance.now() * 0.001;
+        roseGroup.children.forEach((c, i) => {
+          if (c.userData.baseRot !== undefined) {
+            c.rotation.y = c.userData.baseRot + t * 0.15;
+            c.position.y = -2 + Math.sin(t + c.userData.phase) * 0.12;
+          }
+        });
+        if (roseGroup.userData.particles) {
+          roseGroup.userData.particles.rotation.y += 0.002;
+        }
+      }
+
+      // Petals
+      for (let i = this.particles.length - 1; i >= 0; i--) {
+        const p = this.particles[i];
+        p.sway += p.swaySpeed;
+        p.x += p.speedX + Math.sin(p.sway) * 0.4;
+        p.y += p.speedY;
+        p.rot += p.rotSpeed;
+        if (p.life !== undefined) {
+          p.life -= 0.01;
+          if (p.life <= 0) { this.particles.splice(i, 1); continue; }
+        }
+        if (p.y > H + 30 || p.x < -40 || p.x > W + 40) {
+          if (p.life === undefined) {
+            p.x = Math.random() * W; p.y = -20;
+            p.speedY = 0.4 + Math.random() * 1.1;
+          } else {
+            this.particles.splice(i, 1); continue;
+          }
+        }
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        const a = p.life !== undefined ? p.life : p.opacity;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, p.size, p.size * 0.55, 0, 0, Math.PI * 2);
+        const pg = ctx.createRadialGradient(0, 0, 0, 0, 0, p.size);
+        pg.addColorStop(0, `hsla(${p.hue}, 90%, 65%, ${a})`);
+        pg.addColorStop(1, `hsla(${p.hue - 8}, 100%, 35%, ${a * 0.7})`);
+        ctx.fillStyle = pg;
+        ctx.fill();
+        ctx.restore();
+      }
+
+      if (this.particles.length < 80 && Math.random() < 0.3) {
+        this.particles.push(this.makePetal());
+      }
+    }
+  };
+
+  /* ============================================================
+     LETTER TYPEWRITER
+  ============================================================ */
+  const LetterSystem = {
+    typingTimer: null,
+    fullText: '',
+
+    open() {
+      const env = document.getElementById('envelope');
+      if (!env) return;
+      env.classList.add('open');
+      AudioEngine.playWhoosh();
+      setTimeout(() => {
+        const lp = document.getElementById('letterPaper');
+        if (lp) lp.classList.add('show');
+        setTimeout(() => this.startTyping(), 400);
+      }, 900);
+    },
+
+    startTyping() {
+      const body = document.getElementById('letterBody');
+      const sign = document.getElementById('letterSign');
+      if (!body) return;
+      body.innerHTML = '';
+      if (sign) sign.classList.remove('show');
+      this.fullText = CONFIG.letter;
+      let i = 0;
+      clearInterval(this.typingTimer);
+      this.typingTimer = setInterval(() => {
+        if (i >= this.fullText.length) {
+          clearInterval(this.typingTimer);
+          body.innerHTML = safeHTML(this.fullText);
+          if (sign) sign.classList.add('show');
+          return;
+        }
+        i += 1 + Math.floor(Math.random() * 2);
+        const partial = this.fullText.slice(0, i);
+        body.innerHTML = safeHTML(partial) + '<span class="letter-caret"></span>';
+        if (i % 6 === 0) AudioEngine.playChime(1400 + Math.random() * 400, 0.3, 0.02);
+      }, 38);
+    }
+  };
+
+  /* ============================================================
+     PERSONALIZATION
+  ============================================================ */
+  function applyConfigToDOM() {
+    // Update all .sinu elements
+    document.querySelectorAll('.sinu').forEach(el => {
+      const t = el.textContent.trim();
+      if (t.toUpperCase() === 'SINU' || t === 'Sinu') {
+        el.textContent = CONFIG.recipient;
+      }
+    });
+    const heading = document.querySelector('.letter-heading .sinu');
+    if (heading) heading.textContent = CONFIG.recipient;
+
+    const finalMain = document.getElementById('finalMain');
+    if (finalMain) {
+      const safeRecip = safeHTML(CONFIG.recipient.toUpperCase());
+      finalMain.innerHTML = safeHTML(CONFIG.final).replace(/SINU/gi, `<span class="sinu">${safeRecip}</span>`);
+    }
+    const finalSub = document.getElementById('finalSub');
+    if (finalSub) finalSub.textContent = `Forever and Always, ${CONFIG.recipient}.`;
+
+    const sign = document.getElementById('letterSign');
+    if (sign) sign.textContent = `Forever yours, ${CONFIG.sender}.`;
+
+    const voidMsg = document.querySelector('.void-message');
+    if (voidMsg) {
+      voidMsg.innerHTML = `Something beautiful is waiting for <span style="color:#FF4D91;font-weight:600;">${safeHTML(CONFIG.recipient)}</span>...`;
+    }
+    const awTitle = document.querySelector('.awaken-title');
+    if (awTitle) {
+      awTitle.innerHTML = `THIS IS FOR <span class="sinu">${safeHTML(CONFIG.recipient.toUpperCase())}</span>.`;
+    }
+    const terminalSinu = document.querySelector('.terminal-log .sinu-tag');
+    if (terminalSinu) terminalSinu.textContent = CONFIG.recipient.toUpperCase();
+
+    ['#msgLiving .sinu', '#msgUniverse .sinu', '#msgMemory .sinu', '#msgRose .sinu'].forEach(sel => {
+      const el = document.querySelector(sel);
+      if (el) el.textContent = CONFIG.recipient;
+    });
+  }
+
+  /* ============================================================
+     MUSIC VISUALIZER (Canvas 2D)
+  ============================================================ */
+  const Visualizer = {
+    canvas: null, ctx: null, rafId: null, running: false, dataArray: null,
+    init() {
+      if (this.canvas) return;
+      this.canvas = document.getElementById('visualizer');
+      if (!this.canvas) return;
+      this.ctx = this.canvas.getContext('2d');
+      this.resize();
+      window.addEventListener('resize', () => this.resize());
+    },
+    resize() {
+      if (!this.canvas) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      this.canvas.width = window.innerWidth * dpr;
+      this.canvas.height = 70 * dpr;
+      this.canvas.style.width = '100%';
+      this.canvas.style.height = '70px';
+      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    },
+    start() {
+      this.init();
+      if (!this.canvas) return;
+      this.running = true;
+      this._loop();
+    },
+    stop() { this.running = false; if (this.rafId) cancelAnimationFrame(this.rafId); },
+    _loop() {
+      if (!this.running) return;
+      this.rafId = requestAnimationFrame(() => this._loop());
+      const ctx = this.ctx;
+      const W = window.innerWidth, H = 70;
+      ctx.clearRect(0, 0, W, H);
+      if (!AudioEngine.analyser) return;
+      if (!this.dataArray) this.dataArray = new Uint8Array(AudioEngine.analyser.frequencyBinCount);
+      AudioEngine.analyser.getByteFrequencyData(this.dataArray);
+      const bars = 64;
+      const step = Math.floor(this.dataArray.length / bars);
+      const barW = W / bars;
+      for (let i = 0; i < bars; i++) {
+        let v = 0;
+        for (let j = 0; j < step; j++) v += this.dataArray[i * step + j];
+        v = (v / step) / 255;
+        const h = v * H * 0.85;
+        const grad = ctx.createLinearGradient(0, H - h, 0, H);
+        grad.addColorStop(0, 'rgba(255,77,145,0.9)');
+        grad.addColorStop(1, 'rgba(139,0,31,0.2)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(i * barW + 1, H - h, barW - 2, h);
+      }
+    }
+  };
+
+  /* ============================================================
+     UI / CONTROL HANDLERS
+  ============================================================ */
+  const soundBtn = document.getElementById('soundBtn');
+  const fsBtn = document.getElementById('fsBtn');
+  const customBtn = document.getElementById('customBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const customModal = document.getElementById('customModal');
+  const cursorGlow = document.getElementById('cursorGlow');
+  const hudTopRight = document.getElementById('hudTopRight');
+  const volumeSlider = document.getElementById('volumeSlider');
+  const visualizerEl = document.getElementById('visualizer');
+
+  document.getElementById('beginBtn').addEventListener('click', () => {
+    AudioEngine.init();
+    AudioEngine.resume();
+    AudioEngine.startMusic();
+    AudioEngine.playWhoosh();
+    hudTopRight.classList.add('show');
+    visualizerEl.classList.add('show');
+    Visualizer.start();
+    Scenes.goTo('portal');
+  });
+
+  // Sound toggle
+  let soundOn = true;
+  soundBtn.addEventListener('click', () => {
+    soundOn = !soundOn;
+    AudioEngine.setMuted(!soundOn);
+    soundBtn.classList.toggle('muted', !soundOn);
+    soundBtn.setAttribute('aria-label', soundOn ? 'Mute sound' : 'Unmute sound');
+    if (soundOn) {
+      AudioEngine.init();
+      AudioEngine.resume();
+      if (!AudioEngine.started) AudioEngine.startMusic();
+    }
+  });
+
+  // Volume slider
+  if (volumeSlider) {
+    volumeSlider.value = Math.round((CONFIG.volume ?? 0.8) * 100);
+    volumeSlider.addEventListener('input', () => {
+      const v = parseFloat(volumeSlider.value) / 100;
+      AudioEngine.setVolume(v);
+      CONFIG.volume = v;
+      saveConfig(CONFIG);
+    });
+    AudioEngine.setVolume((CONFIG.volume ?? 0.8));
+  }
+
+  fsBtn.addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    } else {
+      document.exitFullscreen?.().catch(() => {});
+    }
+  });
+
+  // Customization
+  const inpRecipient = document.getElementById('inpRecipient');
+  const inpSender = document.getElementById('inpSender');
+  const inpTitle = document.getElementById('inpTitle');
+  const inpLetter = document.getElementById('inpLetter');
+  const inpFinal = document.getElementById('inpFinal');
+
+  customBtn.addEventListener('click', () => {
+    inpRecipient.value = CONFIG.recipient;
+    inpSender.value = CONFIG.sender;
+    inpTitle.value = CONFIG.title;
+    inpLetter.value = CONFIG.letter;
+    inpFinal.value = CONFIG.final;
+    customModal.classList.add('show');
+  });
+  document.getElementById('customCancel').addEventListener('click', () => {
+    customModal.classList.remove('show');
+  });
+  document.getElementById('customReset').addEventListener('click', () => {
+    inpRecipient.value = defaults.recipient;
+    inpSender.value = defaults.sender;
+    inpTitle.value = defaults.title;
+    inpLetter.value = defaults.letter;
+    inpFinal.value = defaults.final;
+  });
+  document.getElementById('customSave').addEventListener('click', () => {
+    CONFIG.recipient = (inpRecipient.value.trim() || defaults.recipient).slice(0, 24);
+    CONFIG.sender = (inpSender.value.trim() || defaults.sender).slice(0, 24);
+    CONFIG.title = inpTitle.value.trim() || defaults.title;
+    CONFIG.letter = inpLetter.value.trim() || defaults.letter;
+    CONFIG.final = inpFinal.value.trim() || defaults.final;
+    saveConfig(CONFIG);
+    applyConfigToDOM();
+    customModal.classList.remove('show');
+    AudioEngine.playChime(1200, 1.2, 0.1);
+  });
+
+  restartBtn.addEventListener('click', () => {
+    clearInterval(Scenes._livingBeat);
+    clearInterval(Scenes._finalBeat);
+    AudioEngine.fadeOutAll();
+    setTimeout(() => location.reload(), 600);
+  });
+
+  document.getElementById('replayAll').addEventListener('click', () => {
+    clearInterval(Scenes._livingBeat);
+    clearInterval(Scenes._finalBeat);
+    document.getElementById('finalMain').classList.remove('show');
+    document.getElementById('finalSub').classList.remove('show');
+    document.getElementById('finalActions').style.opacity = '0';
+    Scenes.hasBegun = false;
+    Scenes.goTo('void');
+  });
+
+  const envelope = document.getElementById('envelope');
+  envelope.addEventListener('click', () => {
+    if (!envelope.classList.contains('open')) LetterSystem.open();
+  });
+  envelope.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (!envelope.classList.contains('open')) LetterSystem.open();
+    }
+  });
+
+  document.getElementById('replayType').addEventListener('click', () => LetterSystem.startTyping());
+  document.getElementById('letterContinue').addEventListener('click', () => {
+    AudioEngine.playWhoosh();
+    Scenes.goTo('final');
+  });
+
+  // Cursor glow
+  let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    cursorGlow.classList.add('active');
+  });
+  window.addEventListener('mouseleave', () => cursorGlow.classList.remove('active'));
+  function animateGlow() {
+    glowX += (mouseX - glowX) * 0.12;
+    glowY += (mouseY - glowY) * 0.12;
+    cursorGlow.style.left = glowX + 'px';
+    cursorGlow.style.top = glowY + 'px';
+    requestAnimationFrame(animateGlow);
+  }
+  animateGlow();
+
+  // Mouse world position for magnetic mode
+  if (isWebGLAvailable) {
+    const raycaster = new THREE.Raycaster();
+    const mouseNDC = new THREE.Vector2();
+    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+    const mouseWorld = new THREE.Vector3();
+    window._mouseWorld = mouseWorld;
+    window.addEventListener('mousemove', (e) => {
+      mouseNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouseNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(mouseNDC, camera);
+      raycaster.ray.intersectPlane(plane, mouseWorld);
     });
 
-    window.addEventListener("mousemove", (event) => {
-      if (!heart.classList.contains("show")) return;
-      const x = (event.clientX / window.innerWidth - 0.5) * 10;
-      const y = (event.clientY / window.innerHeight - 0.5) * -8;
-      heart.style.transform = `rotateX(${y}deg) rotateY(${x}deg)`;
+    // Double-click explosion
+    canvas.addEventListener('dblclick', () => {
+      if (!Scenes.hasBegun) return;
+      heartField.explode(1.6);
+      AudioEngine.playExplosion();
+      setTimeout(() => { heartField.setHeartShape(); heartField.scatter(); }, 1200);
     });
+    let lastTap = 0;
+    canvas.addEventListener('touchend', () => {
+      if (!Scenes.hasBegun) return;
+      const now = Date.now();
+      if (now - lastTap < 320) {
+        heartField.explode(1.4);
+        AudioEngine.playExplosion();
+        setTimeout(() => { heartField.setHeartShape(); heartField.scatter(); }, 1200);
+      }
+      lastTap = now;
+    });
+  }
+
+  // Resize
+  function onResize() {
+    if (isWebGLAvailable) {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      if (composer) composer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+    }
+    RoseGarden.resize?.();
+    Visualizer.resize?.();
+  }
+  window.addEventListener('resize', onResize);
+
+  // Visibility pause
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (Scenes.rafId) { cancelAnimationFrame(Scenes.rafId); Scenes.rafId = null; }
+      AudioEngine.setMuted(true);
+    } else {
+      if (isWebGLAvailable && !Scenes.rafId) Scenes.loop();
+      if (soundOn) { AudioEngine.setMuted(false); AudioEngine.resume(); }
+    }
+  });
+
+  /* ============================================================
+     HIDDEN EASTER EGGS
+  ============================================================ */
+  // Secret keyboard combo: type "sinu" anywhere
+  let keyBuffer = '';
+  document.addEventListener('keydown', (e) => {
+    if (e.key.length === 1) keyBuffer = (keyBuffer + e.key.toLowerCase()).slice(-6);
+    if (keyBuffer.includes('sinu')) {
+      keyBuffer = '';
+      triggerSecretToast(`You found the secret word. <span class="sinu">Sinu</span> loves you too.`);
+      AudioEngine.playChime(1568, 1.5, 0.12);
+      setTimeout(() => AudioEngine.playChime(2093, 1.5, 0.1), 300);
+      // Bonus: magnify heart
+      if (isWebGLAvailable && heartGroup) {
+        heartGroup.scale.setScalar(1.15);
+        setTimeout(() => heartGroup.scale.setScalar(1), 800);
+      }
+    }
+    // Secret: press "l" for love burst
+    if (e.key.toLowerCase() === 'l' && !e.ctrlKey && !e.metaKey && Scenes.hasBegun) {
+      if (isWebGLAvailable) {
+        heartField.explode(1.2);
+        AudioEngine.playChime(880, 1, 0.1);
+        setTimeout(() => { heartField.setHeartShape(); heartField.scatter(); }, 900);
+      }
+    }
+  });
+
+  // Hidden star discovery: click a tiny star in the universe scene
+  let starClicks = 0;
+  if (isWebGLAvailable) {
+    canvas.addEventListener('click', (e) => {
+      if (Scenes.current !== 'universe') return;
+      starClicks++;
+      if (starClicks % 5 === 0) {
+        triggerSecretToast(`A hidden star just whispered: <span class="sinu">Sinu</span>, you are loved.`);
+        AudioEngine.playChime(1318, 2, 0.1);
+      }
+    });
+  }
+
+  function triggerSecretToast(html) {
+    const existing = document.querySelector('.secret-toast');
+    if (existing) existing.remove();
+    const el = document.createElement('div');
+    el.className = 'secret-toast';
+    el.innerHTML = html;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('show'));
+    setTimeout(() => {
+      el.classList.remove('show');
+      setTimeout(() => el.remove(), 600);
+    }, 3200);
+  }
+
+  // Secret star click in universe: clicking a specific area reveals a hidden message
+  // (Handled above via starClicks counter)
+
+  /* ============================================================
+     BOOT
+  ============================================================ */
+  applyConfigToDOM();
+
+  // Add "Begin" listener already attached earlier (above)
+  if (isWebGLAvailable) {
+    Scenes.start();
+  } else {
+    // Fallback: show scenes without 3D
+    document.getElementById('stage-canvas').style.display = 'none';
+    Scenes.buildProgress();
+    Scenes.enterVoid();
+    document.getElementById('progressRail').classList.add('show');
+    // Ensure we can still start audio & show scenes
+    document.getElementById('beginBtn').addEventListener('click', () => {
+      hudTopRight.classList.add('show');
+      Scenes.goTo('portal');
+    }, { once: true });
+  }
+
+  // Update heart target shape colors when config changes (already applied)
+
   </script>
 </body>
 </html>
